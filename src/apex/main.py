@@ -7,20 +7,28 @@ from collections import defaultdict
 from cronkd.conn.db import sqlai
 
 from apex.iud_insertion import confirm_iud_insertion, Document, Result
+from apex.iud_perforation import confirm_iud_perforation
+from apex.schema import validate_config
 
 
-def parse_truth_file(truth_file):
+def parse_annotation_file(file=None):
     data = defaultdict(lambda: None)
-    if truth_file:
-        with open(truth_file) as fh:
+    if file:
+        with open(file) as fh:
             for line in fh:
                 name, res, *comments = line.strip().split()
                 data[name] = int(res)
     return data
 
 
-def get_algorithms():
-    return {'iud_insert': confirm_iud_insertion}
+def get_algorithms(names=None):
+    algos = {
+        'iud_insertion': confirm_iud_insertion,
+        'iud_perforation': confirm_iud_perforation,
+    }
+    if not names:
+        return algos
+    return {x: algos[x] for x in algos if x in names}
 
 
 class Reporter:
@@ -76,8 +84,11 @@ class NullFileWrapper:
 
 class CsvFileWrapper:
 
-    def __init__(self, fp=None, **kwargs):
-        self.fp = fp
+    def __init__(self, file, path=None, **kwargs):
+        if path:
+            self.fp = os.path.join(path, file)
+        else:
+            self.fp = file
         self.fh = None
         self.writer = None
 
@@ -116,26 +127,53 @@ class TableWrapper:
                          f"VALUES ('{line[0]}', '{line[1]}', {line[2]})")
 
 
-def get_file_wrapper(ofp, outformat, **kwargs):
-    if not ofp:
+def get_file_wrapper(name=None, kind=None, path=None,
+                     driver=None, server=None, database=None, **kwargs):
+    if not name:
         return NullFileWrapper()
-    elif outformat == 'csv':
-        return CsvFileWrapper(ofp, **kwargs)
-    elif outformat == 'sql':
-        return TableWrapper(ofp, **kwargs)
+    elif kind == 'csv':
+        return CsvFileWrapper(name, path)
+    elif kind == 'sql':
+        return TableWrapper(name, driver, server, database)
     else:
-        print(ofp, outformat, kwargs)
+        raise ValueError('Unrecognized output file type.')
 
 
-def process(corpus_dir, truth_file=None, outfile=None, outformat=None, start=0, end=None, **kwargs):
-    truth = parse_truth_file(truth_file)
-    algorithms = get_algorithms()
-    results = {name: Reporter() for name in algorithms}
-    with get_file_wrapper(outfile, outformat, **kwargs) as out:
-        for i, f in enumerate(os.listdir(corpus_dir)[start:end]):
-            doc = Document(f.split('.')[0], file=os.path.join(corpus_dir, f))
-            for name, algorithm in algorithms.items():
-                res = algorithm(doc, truth[doc.name])
+def make_kwargs(*args, **kwargs):
+    for val in args:
+        if val is None:
+            continue
+        elif isinstance(val, dict):
+            kwargs.update(val)
+        else:
+            raise ValueError(f'Unrecognized kwargs: {val}')
+    return kwargs
+
+
+def get_next_from_corpus(directory=None, version=None, start=0, end=None):
+    """
+
+    :param directory:
+    :param version:
+    :param start:
+    :param end:
+    :return: iterator yielding documnets
+    """
+    corpus_dir = os.path.join(directory, version)
+    for file in os.listdir(corpus_dir)[start:end]:
+        doc_name = file.split('.')[0]
+        fp = os.path.join(corpus_dir, file)
+        yield Document(doc_name, file=fp)
+
+
+def process(corpus=None, annotation=None, output=None, select=None, algorithm=None):
+    truth = parse_annotation_file(**make_kwargs(annotation))
+    algos = get_algorithms(**make_kwargs(algorithm))
+    results = {name: Reporter() for name in algos}
+    with get_file_wrapper(**output) as out:
+        for i, doc in enumerate(get_next_from_corpus(**corpus, **select)):
+            for name, alg_func in algos.items():
+                res = alg_func(doc, truth[doc.name])
                 logging.debug(f'{i}:{doc.name}[{res}==Expected({truth[doc.name]})]::{doc.matches}')
                 if res.value >= 0:
                     out.writeline([doc.name, name, res.value])
@@ -143,10 +181,15 @@ def process(corpus_dir, truth_file=None, outfile=None, outformat=None, start=0, 
     print(results)
 
 
-def main():
+def main(config_file):
+    conf = validate_config(config_file)
     logging.basicConfig(level=logging.DEBUG)
-    process(corpus_dir, truth_file, outfile, outformat, start, end, **kw)
+    process(**conf)
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    try:
+        main(sys.argv[1])
+    except IndexError:
+        raise AttributeError('Missing configuration file: Usage: main.py file.(json|yaml|py)')
