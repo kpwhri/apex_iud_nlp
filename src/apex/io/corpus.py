@@ -41,9 +41,10 @@ class Skipper:
         return set()
 
     def add(self, doc_name):
-        self.skips.add(doc_name)
-        if self.fp:
-            self.fh.write(doc_name + '\n')
+        if doc_name not in self.skips:
+            self.skips.add(doc_name)
+            if self.fp:
+                self.fh.write(doc_name + '\n')
 
     def __contains__(self, item):
         return item in self.skips
