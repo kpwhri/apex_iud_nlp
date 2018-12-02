@@ -33,7 +33,7 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
         for i, doc in enumerate(get_next_from_corpus(**corpus, **select)):
             for name, alg_func in algos.items():
                 res = alg_func(doc, truth[doc.name])
-                logging.debug(f'{i}:{doc.name}[{res}==Expected({truth[doc.name]})]::{doc.matches}')
+                # logging.debug(f'{i}:{doc.name}[{res}==Expected({truth[doc.name]})]::{doc.matches}')
                 if res.value >= 0:
                     out.writeline([doc.name, name, res.value])
                 results[name].update(res)
