@@ -1,4 +1,4 @@
-def make_kwargs(*args, **kwargs):
+def kw(*args, **kwargs):
     for val in args:
         if val is None:
             continue

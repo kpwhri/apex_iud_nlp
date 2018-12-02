@@ -2,12 +2,9 @@
 Confirm IUD Insertion on specified date
 """
 import enum
-import logging
-from collections import namedtuple
 
 from apex.algo.pattern import Pattern, Document
-
-Result = namedtuple('Result', 'value correct')
+from apex.algo.result import Result
 
 
 class InsertionStatus(enum.Enum):
@@ -55,15 +52,9 @@ def classify_result(res: InsertionStatus):
 
 
 def confirm_iud_insertion(document: Document, expected=None):
-    value = determine_iud_insertion(document)
+    value, text = determine_iud_insertion(document)
     res = classify_result(value)
-    if expected is None:
-        return Result(res, None)
-    elif res == expected:
-        return Result(res, res == expected)
-    else:  # failed
-        logging.warning(f'{document.name}:{value}=={expected}:{document.matches}')
-        return Result(res, res == expected)
+    return Result(value, res, expected, text)
 
 
 def determine_iud_insertion(document: Document):
@@ -74,17 +65,17 @@ def determine_iud_insertion(document: Document):
                                                           neighboring_sentences=1)
         if section:
             if section.has_patterns(PRE_SUCCESS):
-                return InsertionStatus.SUCCESS
+                return InsertionStatus.SUCCESS, section.text
             elif section.has_patterns(UNSUCCESSFUL, NOT_SUCCESSFUL):
-                return InsertionStatus.FAILED
+                return InsertionStatus.FAILED, section.text
             elif section.has_patterns(HYPOTHETICAL):
-                return InsertionStatus.HYPOTHETICAL
+                return InsertionStatus.HYPOTHETICAL, section.text
             elif section.has_patterns(POST_SUCCESS):
-                return InsertionStatus.SUCCESS
+                return InsertionStatus.SUCCESS, section.text
             elif section.has_patterns(POST_OP):
-                return InsertionStatus.LIKELY_SUCCESS
+                return InsertionStatus.LIKELY_SUCCESS, section.text
             else:
-                return InsertionStatus.UNKNOWN
+                return InsertionStatus.UNKNOWN, section.text
         else:
-            return InsertionStatus.UNKNOWN
-    return InsertionStatus.NO_MENTION
+            return InsertionStatus.UNKNOWN, None
+    return InsertionStatus.NO_MENTION, None

@@ -43,6 +43,10 @@ JSON_SCHEMA = {
                 'type': 'array',
                 'items': {'type': 'string'}
             }
+        },
+        'loginfo': {
+            'type': 'object',
+            'directory': {'type': 'string'}
         }
     }
 }

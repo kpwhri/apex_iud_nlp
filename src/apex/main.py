@@ -3,10 +3,10 @@ from collections import defaultdict
 
 from apex.algo import ALGORITHMS
 from apex.io.corpus import get_next_from_corpus
-from apex.io.out import get_file_wrapper
+from apex.io.out import get_file_wrapper, get_logging
 from apex.io.report import Reporter
 from apex.schema import validate_config
-from apex.util import make_kwargs
+from apex.util import kw
 
 
 def parse_annotation_file(file=None):
@@ -25,17 +25,18 @@ def get_algorithms(names=None):
     return {x: ALGORITHMS[x] for x in ALGORITHMS if x in names}
 
 
-def process(corpus=None, annotation=None, output=None, select=None, algorithm=None):
-    truth = parse_annotation_file(**make_kwargs(annotation))
-    algos = get_algorithms(**make_kwargs(algorithm))
+def process(corpus=None, annotation=None, output=None, select=None, algorithm=None, loginfo=None):
+    truth = parse_annotation_file(**kw(annotation))
+    algos = get_algorithms(**kw(algorithm))
     results = {name: Reporter() for name in algos}
-    with get_file_wrapper(**output) as out:
+    with get_file_wrapper(**output) as out, get_logging(**kw(loginfo)) as log:
         for i, doc in enumerate(get_next_from_corpus(**corpus, **select)):
             for name, alg_func in algos.items():
                 res = alg_func(doc, truth[doc.name])
-                # logging.debug(f'{i}:{doc.name}[{res}==Expected({truth[doc.name]})]::{doc.matches}')
-                if res.value >= 0:
-                    out.writeline([doc.name, name, res.value])
+                print(i, name, res, doc.matches)
+                if res:
+                    out.writeline([doc.name, name, res.result])
+                    log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
                 results[name].update(res)
     print(results)
 
