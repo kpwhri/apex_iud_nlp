@@ -1,7 +1,7 @@
 import enum
 
 from apex.algo.pattern import Document, Pattern
-from apex.algo.result import Result
+from apex.algo.result import Result, Status
 
 iuds = r'\b(iuds?|intrauterine( contraceptive)? devices?)'
 lng_iuds = r'(lng ius|levonorgestrel( (releasing|rlse))? (intrauterine|us))'
@@ -17,11 +17,12 @@ IUD = Pattern(f'({iuds}|{lng_iuds}|{brand})')
 EMBEDDED = Pattern(f'({embedded}|{migrated})', negates=[hypothetical, negation])
 
 
-class PerforationStatus(enum.Enum):
+class PerforationStatus(Status):
     NONE = 0
     PERFORATION = 1
     EMBEDDED = 2
     UNKNOWN = 3
+    SKIP = 99
 
 
 def classify_result(res: PerforationStatus):
@@ -47,4 +48,6 @@ def determine_iud_perforation(document: Document):
                 return PerforationStatus.PERFORATION, section.text
             elif section.has_patterns(EMBEDDED):
                 return PerforationStatus.EMBEDDED, section.text
-    return PerforationStatus.NONE, None
+        return PerforationStatus.NONE, document.text
+    else:
+        return PerforationStatus.SKIP, None

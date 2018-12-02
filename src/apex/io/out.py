@@ -28,6 +28,7 @@ class CsvFileWrapper:
     def __init__(self, file, path=None, **kwargs):
         if path:
             self.fp = os.path.join(path, file)
+            os.makedirs(path, exist_ok=True)
         else:
             self.fp = file
         self.fh = None
@@ -54,6 +55,7 @@ class TsvFileWrapper:
     def __init__(self, file, path=None, **kwargs):
         if path:
             self.fp = os.path.join(path, file)
+            os.makedirs(path, exist_ok=True)
         else:
             self.fp = file
         self.fh = None

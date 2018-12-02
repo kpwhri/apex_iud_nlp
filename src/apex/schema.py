@@ -46,7 +46,17 @@ JSON_SCHEMA = {
         },
         'loginfo': {
             'type': 'object',
-            'directory': {'type': 'string'}
+            'properties': {
+                'directory': {'type': 'string'}
+            }
+        },
+        'skipinfo': {
+            'type': 'object',
+            'properties': {
+                'path': {'type': 'string'},
+                'rebuild': {'type': 'boolean'},
+                'ignore': {'type': 'boolean'},
+            }
         }
     }
 }

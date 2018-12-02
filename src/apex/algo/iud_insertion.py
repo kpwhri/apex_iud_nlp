@@ -1,19 +1,18 @@
 """
 Confirm IUD Insertion on specified date
 """
-import enum
-
 from apex.algo.pattern import Pattern, Document
-from apex.algo.result import Result
+from apex.algo.result import Result, Status
 
 
-class InsertionStatus(enum.Enum):
+class InsertionStatus(Status):
     FAILED = 0
     HYPOTHETICAL = 1
     SUCCESS = 2
     LIKELY_SUCCESS = 3
     UNKNOWN = 4
     NO_MENTION = 5
+    SKIP = 99
 
 
 IUD = Pattern(r'\b(mirena|paragard|iud|ius)\b')
