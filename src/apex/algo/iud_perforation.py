@@ -12,9 +12,10 @@ migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+|(intra)?peritone
 hypothetical = r'\b(risk|complication|warning|information|review|side effect|counsel)'
 negation = r'(no evidence|without|r/o|rule out|normal)'
 
-PERFORATION = Pattern(r'perforat\w*', negates=[hypothetical, negation])
+PERFORATION = Pattern(r'perforat(ion|ed|e)s?', negates=[hypothetical, negation])
 IUD = Pattern(f'({iuds}|{lng_iuds}|{brand})')
-EMBEDDED = Pattern(f'({embedded}|{migrated})', negates=[hypothetical, negation])
+EMBEDDED = Pattern(f'({embedded})', negates=[hypothetical, negation])
+MIGRATED = Pattern(f'{migrated}', negates=[hypothetical, negation])
 
 
 class PerforationStatus(Status):
@@ -22,6 +23,7 @@ class PerforationStatus(Status):
     PERFORATION = 1
     EMBEDDED = 2
     UNKNOWN = 3
+    MIGRATED = 4
     SKIP = 99
 
 
@@ -40,7 +42,7 @@ def confirm_iud_perforation(document: Document, expected=None):
 
 
 def determine_iud_perforation(document: Document):
-    if document.has_patterns(PERFORATION, EMBEDDED):
+    if document.has_patterns(PERFORATION, EMBEDDED, MIGRATED):
         # see if any sentences that contain "IUD" also contain perf/embedded
         section = document.select_sentences_with_patterns(IUD)
         if section:
@@ -48,6 +50,8 @@ def determine_iud_perforation(document: Document):
                 return PerforationStatus.PERFORATION, section.text
             elif section.has_patterns(EMBEDDED):
                 return PerforationStatus.EMBEDDED, section.text
+            elif section.has_patterns(MIGRATED):
+                return PerforationStatus.MIGRATED, section.text
         return PerforationStatus.NONE, document.text
     else:
         return PerforationStatus.SKIP, None
