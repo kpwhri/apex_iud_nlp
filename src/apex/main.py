@@ -35,13 +35,19 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
             Skipper(**skipinfo) as skipper:
         for i, doc in enumerate(get_next_from_corpus(**kw(corpus), **kw(select), skipper=skipper)):
             for name, alg_func in algos.items():
-                res = alg_func(doc, truth[doc.name])
-                if res:
-                    out.writeline([doc.name, name, res.result, res.extras])
-                    log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
-                elif res.is_skip():
-                    skipper.add(doc.name)
-                results[name].update(res)
+                max_res = None
+                for res in alg_func(doc, truth[doc.name]):
+                    if res:
+                        out.writeline([doc.name, name, res.result, res.extras])
+                        log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
+                    elif res.is_skip():  # always skip
+                        skipper.add(doc.name)
+                        break
+                    # only take max
+                    if not max_res or res.result > max_res.result:
+                        max_res = res
+                if max_res and not max_res.is_skip():
+                    results[name].update(max_res)
     print(results)
 
 
