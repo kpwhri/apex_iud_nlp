@@ -22,6 +22,12 @@ class Pattern:
             return m
         return False
 
+    def matchgroup(self, text, index=0):
+        m = self.matches(text)
+        if m:
+            return m.group(0)
+        return m
+
 
 class MatchCask:
 
@@ -58,6 +64,13 @@ class Sentence:
                 return True
         return has_all
 
+    def get_pattern(self, pat, index=0):
+        m = pat.matches(self.text)
+        if m:
+            self.matches.add(m)
+            return m.group(index)
+        return m
+
 
 class Section:
 
@@ -71,6 +84,13 @@ class Section:
         if m:
             self.matches.add(m)
         return bool(m)
+
+    def get_pattern(self, pat, index=0):
+        m = pat.matches(self.text)
+        if m:
+            self.matches.add(m)
+            return m.group(index)
+        return m
 
     def has_patterns(self, *pats, has_all=False):
         for pat in pats:
@@ -97,6 +117,13 @@ class Document:
         if m:
             self.matches.add(m)
         return bool(m)
+
+    def get_pattern(self, pat, index):
+        m = pat.matches(self.text)
+        if m:
+            self.matches.add(m)
+            return m.group(index)
+        return m
 
     def has_patterns(self, *pats, has_all=False):
         for pat in pats:

@@ -33,11 +33,11 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
     with get_file_wrapper(**output) as out, \
             get_logging(**kw(loginfo)) as log, \
             Skipper(**skipinfo) as skipper:
-        for i, doc in enumerate(get_next_from_corpus(**corpus, **select, skipper=skipper)):
+        for i, doc in enumerate(get_next_from_corpus(**kw(corpus), **kw(select), skipper=skipper)):
             for name, alg_func in algos.items():
                 res = alg_func(doc, truth[doc.name])
                 if res:
-                    out.writeline([doc.name, name, res.result])
+                    out.writeline([doc.name, name, res.result, res.extras])
                     log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
                 elif res.is_skip():
                     skipper.add(doc.name)

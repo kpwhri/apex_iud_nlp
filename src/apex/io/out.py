@@ -106,7 +106,7 @@ def get_file_wrapper(name=None, kind=None, path=None,
         return NullFileWrapper()
     name = name.replace('{datetime}', DATETIME_STR)
     if kind == 'csv':
-        return CsvFileWrapper(name, path, header=['name', 'algorithm', 'value'])
+        return CsvFileWrapper(name, path, header=['name', 'algorithm', 'value', 'extras'])
     elif kind == 'sql':
         return TableWrapper(name, driver, server, database)
     else:

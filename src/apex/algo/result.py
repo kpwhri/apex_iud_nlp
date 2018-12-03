@@ -11,20 +11,32 @@ class DefaultStatus(Status):
 
 class Result:  # = namedtuple('Result', 'value correct')
 
-    __slots__ = ['_value', 'result', 'expected', '_text', 'correct']
+    __slots__ = ['_value', 'result', 'expected', '_text', 'correct', '_extras']
 
-    def __init__(self, value: Status, result, expected=None, text=None):
+    def __init__(self, value: Status, result, expected=None,
+                 text=None, extras=None):
         self._value = value
         self.result = result
         self.expected = expected
         self._text = text
         self.correct = None
+        if not extras:
+            self._extras = list()
+        elif isinstance(extras, list):
+            self._extras = extras
+        else:
+            self._extras = [extras]
+        self._extras = extras or list()
         if self.expected:
             self.correct = self.result == self.expected
 
     @property
     def value(self):
         return self._value.name
+
+    @property
+    def extras(self):
+        return ','.join(self._extras)
 
     @property
     def text(self):
