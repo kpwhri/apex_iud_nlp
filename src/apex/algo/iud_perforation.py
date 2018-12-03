@@ -7,8 +7,8 @@ brand = r'(mirena|paragu?ard|skyla|liletta|copper)'
 embedded = r'([ie]mbedded|impacted)'
 # removed: |foreign body
 migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+|(intra)?peritoneal)'
-hypothetical = r'\b(risk|complication|warning|information|review|side effect|counsel|sign|chance)'
-negation = r'(no evidence|without|r/o|rule out|normal|unlikely|improbable|potential|if|ensure|not?)'
+hypothetical = r'\b(risk|complication|warning|information|review|side effect|counsel|sign|chance|or|infection)'
+negation = r'(no evidence|without|r/o|rule out|normal|unlikely|improbable|potential|\bif\b|ensure|\bnot?\b|suspect)'
 
 impact_neg = r'(cerumen|tympanic|ear)'
 
