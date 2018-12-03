@@ -9,7 +9,7 @@ class DefaultStatus(Status):
     SKIP = 99
 
 
-class Result:  # = namedtuple('Result', 'value correct')
+class Result:
 
     __slots__ = ['_value', 'result', 'expected', '_text', 'correct', '_extras']
 

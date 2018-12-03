@@ -15,18 +15,18 @@ class Reporter:
         self.unk = 0
 
     def update(self, result: Result):
-        if result.value == 1:
+        if result.result == 1:
             self.pos += 1
-            if result.correct == 1:
+            if result.expected == 1:
                 self.tp += 1
-            elif result.correct == -1:
+            elif result.expected == -1:
                 self.fp += 1
-        elif result.value == -1:
+        elif result.result == -1:
             self.neg += 1
-            if result.correct == 1:
-                self.tn += 1
-            elif result.correct == -1:
+            if result.expected == 1:
                 self.fn += 1
+            elif result.expected == -1:
+                self.tn += 1
         else:
             self.unk += 1
 
