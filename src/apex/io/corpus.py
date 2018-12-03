@@ -3,26 +3,33 @@ import os
 from apex.algo.pattern import Document
 
 
-def get_next_from_corpus(directory=None, version=None, skipper=None, start=0, end=None):
+def get_next_from_corpus(directory=None, directories=None, version=None, skipper=None, start=0, end=None):
     """
 
+    :param directories: list of directories to look through
     :param skipper:
-    :param directory:
-    :param version:
+    :param directory: first to look through (for backwards compatibility)
+    :param version: text|lemma|token
     :param start:
     :param end:
-    :return: iterator yielding documnets
+    :return: iterator yielding documents
     """
-    corpus_dir = os.path.join(directory, version)
-    for i, entry in enumerate(os.scandir(corpus_dir)):
-        if i < start:
-            continue
-        elif end and i >= end:
-            break
-        doc_name = entry.name.split('.')[0]
-        if skipper and doc_name in skipper:
-            continue
-        yield Document(doc_name, file=entry.path)
+    directories = directories or []
+    if directory:
+        directories.insert(0, directory)
+    i = -1
+    for directory in directories:
+        corpus_dir = os.path.join(directory, version)
+        for entry in os.scandir(corpus_dir):
+            doc_name = entry.name.split('.')[0]
+            if skipper and doc_name in skipper:
+                continue
+            i += 1
+            if i < start:
+                continue
+            elif end and i >= end:
+                break
+            yield Document(doc_name, file=entry.path)
 
 
 class Skipper:

@@ -10,6 +10,10 @@ JSON_SCHEMA = {
             'type': 'object',
             'properties': {
                 'directory': {'type': 'string'},
+                'directories': {
+                    'type': 'array',
+                    'items': {'type': 'string'}
+                },
                 'version': {'type': 'string'}  # text or lemma
             }
         },
