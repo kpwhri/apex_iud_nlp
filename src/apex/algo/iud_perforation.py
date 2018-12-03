@@ -8,17 +8,21 @@ embedded = r'([ie]mbedded|impacted)'
 # removed: |foreign body
 migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+|(intra)?peritoneal)'
 boilerplate = r'\b(complication|warning|information|review|side effect|counsel|sign|infection|ensure|cramps)'
-hypothetical = r'\b(unlikely|improbable|potential|if\b|suspect|chance|may\b|risk|afraid|concern)'
+hypothetical = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|if\b|suspect|chance|may\b|risk|afraid|concern)'
 negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b)'
+history = r'(history of)'
 
 impact_neg = r'(cerumen|tympanic|ear|hormon\w+)'
 
-PERFORATION = Pattern(r'perforat(ion|ed|e)s?', negates=[boilerplate, hypothetical, negation, impact_neg])
+PERFORATION = Pattern(r'perforat(ion|ed|e)s?',
+                      negates=[boilerplate, history, hypothetical, negation, impact_neg])
 PARTIAL_PERFORATION = Pattern(r'partial(ly)? perforat(ion|ed|e)s?',
-                              negates=[boilerplate, hypothetical, negation, impact_neg])
+                              negates=[boilerplate, history, hypothetical, negation, impact_neg])
 IUD = Pattern(f'({iuds}|{lng_iuds}|{brand})')
-EMBEDDED = Pattern(f'({embedded})', negates=[boilerplate, hypothetical, negation, impact_neg])
-MIGRATED = Pattern(f'{migrated}', negates=[boilerplate, hypothetical, negation])
+EMBEDDED = Pattern(f'({embedded})',
+                   negates=[boilerplate, history, hypothetical, negation, impact_neg])
+MIGRATED = Pattern(f'{migrated}',
+                   negates=[boilerplate, history, hypothetical, negation])
 
 years_ago = r'(?:\d+ (?:year|yr|week|wk|month|mon|day)s? (?:ago|before|previous))'
 date_pat = r'\d+[-/]\d+[-/]\d+'
