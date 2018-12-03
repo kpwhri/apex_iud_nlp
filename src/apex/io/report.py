@@ -12,6 +12,7 @@ class Reporter:
         # prevalence
         self.pos = 0
         self.neg = 0
+        self.neutral = 0
         self.unk = 0
 
     def update(self, result: Result):
@@ -27,11 +28,17 @@ class Reporter:
                 self.fn += 1
             elif result.expected == -1:
                 self.tn += 1
+        elif result.result == 0:
+            self.neutral += 1
+            if result.expected == 0:
+                self.tp += 1
+            elif result.expected == -1:
+                self.fp += 1
         else:
             self.unk += 1
 
     def __repr__(self):
-        return f'[{self.tp}-{self.fp}/{self.fn}-{self.tn}]:{self.pos}/{self.neg}'
+        return f'[{self.tp}-{self.fp}/{self.fn}-{self.tn}]:{self.pos}+{self.neutral}/{self.neg}:{self.unk}'
 
     def __str__(self):
-        return f'[{self.tp}-{self.fp}/{self.fn}-{self.tn}]:{self.pos}/{self.neg}'
+        return f'[{self.tp}-{self.fp}/{self.fn}-{self.tn}]:{self.pos}+{self.neutral}/{self.neg}:{self.unk}'

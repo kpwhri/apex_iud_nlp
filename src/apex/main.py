@@ -39,15 +39,16 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
                 for res in alg_func(doc, truth[doc.name]):
                     if res:
                         out.writeline([doc.name, name, res.result, res.value, res.extras])
-                        log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
                     elif res.is_skip():  # always skip
                         skipper.add(doc.name)
                         break
+                    log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
                     # only take max
                     if not max_res or res.result > max_res.result:
                         max_res = res
-                if max_res and not max_res.is_skip():
-                    results[name].update(max_res)
+                else:  # avoid if skipped
+                    if max_res is not None:
+                        results[name].update(max_res)
     print(results)
 
 
