@@ -1,5 +1,3 @@
-import enum
-
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result, Status
 
