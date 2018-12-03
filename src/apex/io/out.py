@@ -89,15 +89,17 @@ class TableWrapper:
         self.tablename = f'{tablename}_{DATETIME_STR}'
 
     def __enter__(self):
-        self.eng.execute(f'create table {self.tablename} (name varchar(100), algorithm varchar(100), value int)')
+        self.eng.execute(f'create table {self.tablename} '
+                         f'(name varchar(100), algorithm varchar(100), value int, '
+                         f'category varchar(100), extras varchar(200))')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.eng.dispose()
 
     def writeline(self, line):
-        self.eng.execute(f"insert into {self.tablename} (name, algorithm, value) "
-                         f"VALUES ('{line[0]}', '{line[1]}', {line[2]})")
+        self.eng.execute(f"insert into {self.tablename} (name, algorithm, value, category, extras) "
+                         f"VALUES ('{line[0]}', '{line[1]}', {line[2]}, '{line[3]}', '{line[4]}')")
 
 
 def get_file_wrapper(name=None, kind=None, path=None,
@@ -106,7 +108,7 @@ def get_file_wrapper(name=None, kind=None, path=None,
         return NullFileWrapper()
     name = name.replace('{datetime}', DATETIME_STR)
     if kind == 'csv':
-        return CsvFileWrapper(name, path, header=['name', 'algorithm', 'value', 'extras'])
+        return CsvFileWrapper(name, path, header=['name', 'algorithm', 'value', 'category', 'extras'])
     elif kind == 'sql':
         return TableWrapper(name, driver, server, database)
     else:

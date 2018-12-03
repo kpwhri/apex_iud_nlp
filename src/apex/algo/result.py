@@ -26,7 +26,6 @@ class Result:
             self._extras = extras
         else:
             self._extras = [extras]
-        self._extras = extras or list()
         if self.expected:
             self.correct = self.result == self.expected
 

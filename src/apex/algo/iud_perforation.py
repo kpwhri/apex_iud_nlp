@@ -39,7 +39,11 @@ class PerforationStatus(Status):
 
 
 def classify_result(res: PerforationStatus, date):
-    if res == PerforationStatus.PERFORATION:
+    if res == PerforationStatus.PARTIAL_PERFORATION:
+        if date:
+            return 0
+        return 1
+    elif res == PerforationStatus.PERFORATION:
         if date:
             return 0
         return 1
