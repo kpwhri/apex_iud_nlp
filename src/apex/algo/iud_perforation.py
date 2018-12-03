@@ -7,10 +7,10 @@ brand = r'(mirena|paragu?ard|skyla|liletta|copper)'
 embedded = r'([ie]mbedded|impacted)'
 # removed: |foreign body
 migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+|(intra)?peritoneal)'
-boilerplate = r'\b(complication|warning|information|review|side effect|counsel|sign|infection|ensure|cramps)'
+boilerplate = r'\b(complication|pamphlet|warning|information|review|side effect|counsel|sign|infection|ensure|cramps)'
 hypothetical = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|if\b|suspect|chance|may\b|risk|afraid|concern)'
 negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b)'
-history = r'(history of)'
+history = r'(history of|previous)'
 
 impact_neg = r'(cerumen|tympanic|ear|hormon\w+)'
 
