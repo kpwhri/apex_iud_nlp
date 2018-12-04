@@ -50,7 +50,7 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
                     if max_res is not None:
                         results[name].update(max_res)
                         if max_res.expected is not None:
-                            print(results)
+                            print(doc.name, results)
     print(results)
 
 
