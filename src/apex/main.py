@@ -49,6 +49,8 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
                 else:  # avoid if skipped
                     if max_res is not None:
                         results[name].update(max_res)
+                        if max_res.expected:
+                            print(results)
     print(results)
 
 

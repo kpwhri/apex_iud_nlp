@@ -39,7 +39,8 @@ class Result:
 
     @property
     def text(self):
-        return ' '.join(self._text.split())
+        if self._text:
+            return ' '.join(self._text.split())
 
     def is_skip(self):
         return self._value.value == 99
@@ -51,4 +52,4 @@ class Result:
         return repr(self)
 
     def __bool__(self):
-        return self.result >= 0
+        return self.result >= 0 and not self.is_skip()

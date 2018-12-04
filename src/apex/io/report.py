@@ -9,6 +9,8 @@ class Reporter:
         self.fp = 0
         self.fn = 0
         self.tn = 0
+        # errors
+        self.error = 0  # error, guessed positive
         # prevalence
         self.pos = 0
         self.neg = 0
@@ -16,12 +18,14 @@ class Reporter:
         self.unk = 0
 
     def update(self, result: Result):
-        if result.result == 1:
+        if result.result >= 1:
             self.pos += 1
-            if result.expected == 1:
+            if result.expected == result.result:
                 self.tp += 1
             elif result.expected == -1:
                 self.fp += 1
+            elif result.expected is not None:
+                self.error += 1
         elif result.result == -1:
             self.neg += 1
             if result.expected == 1:
@@ -38,7 +42,7 @@ class Reporter:
             self.unk += 1
 
     def __repr__(self):
-        return f'[{self.tp}-{self.fp}/{self.fn}-{self.tn}]:{self.pos}+{self.neutral}/{self.neg}:{self.unk}'
+        return f'[{self.tp}-{self.fp} ({self.error})/{self.fn}-{self.tn}]:{self.pos}+{self.neutral}/{self.neg}:{self.unk}'
 
     def __str__(self):
-        return f'[{self.tp}-{self.fp}/{self.fn}-{self.tn}]:{self.pos}+{self.neutral}/{self.neg}:{self.unk}'
+        return f'[{self.tp}-{self.fp} ({self.error})/{self.fn}-{self.tn}]:{self.pos}+{self.neutral}/{self.neg}:{self.unk}'
