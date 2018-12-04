@@ -10,7 +10,7 @@ PARAGARD = Pattern(r'(paragu?ard)', negates=[hypothetical])
 MIRENA = Pattern(r'(mirena)', negates=[hypothetical])
 LILETTA = Pattern(r'(lilett?a)', negates=[hypothetical])
 KYLEENA = Pattern(r'(kyleena)', negates=[hypothetical])
-SKYLA = Pattern(r'(skyla)', negates=[hypothetical])
+SKYLA = Pattern(r'(skyla)\b', negates=[hypothetical])
 COPPER = Pattern(r'(copper) (\w+ )?iu[sd]\b', negates=[hypothetical])
 LNG = Pattern(r'(levonorgestrel|lng) (\w+ )?iu[sd]\b',
               negates=['oral tab', hypothetical])
@@ -32,16 +32,26 @@ class BrandStatus(Status):
 
 
 def get_iud_brand(document: Document, expected=None):
+    """
+    Heuristics:
+        * there can be multiple brands mentioned in a single sentence,
+            but more frequent usually selecte
+        * context which discusses 'use'/'had'/'insert'/'contraception' retained prior
+            to other mentions
+    :param document:
+    :param expected:
+    :return:
+    """
     brands = determine_iud_brand(document)
     if len(brands) > 1:
-        # if any has_using values, only retain those
+        # if any has_using ('use', 'insert', 'contraception') values, only retain those
         has_using = bool([u for _, u, _ in brands if u])
         # get most frequent (sometimes there is discussion of more than one)
         brands = ((b, u, t) for b, u, t in brands if u == has_using)
         c = Counter(b for b, u, _ in brands)
-        if len(c) > 1:
+        if len(c) > 1:  # still multiple brands
             v1, v2 = c.most_common(2)
-            if v1[1] == v2[1]:
+            if v1[1] == v2[1]:  # equally frequent, likely hypothetical discussion
                 yield Result(BrandStatus.NONE, -1, expected, text=document.text)
                 raise StopIteration
             brands = ((b, u, t) for b, u, t in brands if c[b] == v1[1])
@@ -63,7 +73,7 @@ def determine_iud_brand(document: Document):
                 brands.append((BrandStatus.KYLEENA, section.has_patterns(USING), section.text))
             if section.has_patterns(SKYLA):
                 brands.append((BrandStatus.SKYLA, section.has_patterns(USING), section.text))
-        if not brands:
+        if not brands:  # only look for LNG if no brand name
             if document.has_patterns(LNG):
                 brands.append((BrandStatus.LNG,  False, document.text))
             else:
