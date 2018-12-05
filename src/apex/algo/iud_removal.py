@@ -62,7 +62,7 @@ def determine_iud_removal(document: Document):
                 if section.has_patterns(REMOVE):
                     yield RemoveStatus.REMOVE, section.text
                 if section.has_patterns(PLAN):
-                    yield RemoveStatus.PLAN
+                    yield RemoveStatus.PLAN, section.text
             else:
                 section_text.append(section.text)
         if section_text:
