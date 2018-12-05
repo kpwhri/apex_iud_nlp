@@ -4,21 +4,34 @@ from apex.algo.result import Status, Result
 
 in_place = r'(?<!not) in (place|situ)\b'
 negation = r'(ready|should|sometimes|must|decline|\bnot\b)'
-hypothetical = r'(option|possib\w+|desire|want|will|\bor\b|like|would|until|request)'
+hypothetical = r'(option|possib\w+|desire|want|will|\bcan\b|' \
+               r'\bor\b|like|would|need|until|request|when|you ll|' \
+               r'\bif\b|consider|concern|return|nervous|anxious|to be remov|could|' \
+               r'discuss)'
 boilerplate = r'(risk|after your visit|chance|conceive|appt|appointment|due (to|for|at)|recommend|' \
               r'pregnan|pamphlet|schedul|doctor)'
-other = r'(fibroid|v25.13)'
+other = r'(fibroid|v25.1\d|tampon)'
+tool_remove = r'(introducer|inserter|tenaculum|instruments?)( (was|were))? removed'
+# avoid months (followed by day/year)
+# avoid 'last' or 'in' or 'since'
+safe_hypo_may = r'(?<!in|st|ce) may (?!\d)'
 
 REMOVE = Pattern(r'(remov\w+|replac\w+)',
-                 negates=[negation, boilerplate, hypothetical, in_place, other])
+                 negates=[negation, boilerplate, hypothetical, in_place,
+                          other, tool_remove, safe_hypo_may])
 # describe tool or the "how" of removal
-TOOL = Pattern(r'((ring )?forceps?|fashion|strings? grasp|grasp\w+ strings?)')
+TOOL = Pattern(r'((ring )?forceps?|hook|speculum|fashion|'
+               r'strings? (grasp|clasp)|(grasp|clasp)\w* strings?|'
+               r'(with|gentle|more|\bw) traction)')
+PLAN = Pattern(r'\brem intrauterine device\b',
+               negates=[hypothetical, boilerplate, negation, other, safe_hypo_may])
 
 
 class RemoveStatus(Status):
     NONE = -1
     REMOVE = 1
     TOOL_REMOVE = 2
+    PLAN = 3
     SKIP = 99
 
 
@@ -32,24 +45,29 @@ def classify_result(res: RemoveStatus):
 
 
 def confirm_iud_removal(document: Document, expected=None):
-    value, text = determine_iud_removal(document)
-    res = classify_result(value)
-    yield Result(value, res, expected, text)
+    for value, text in determine_iud_removal(document):
+        res = classify_result(value)
+        yield Result(value, res, expected, text)
 
 
 def determine_iud_removal(document: Document):
     if document.has_patterns(REMOVE, ignore_negation=True):
         section_text = []
         for section in document.select_sentences_with_patterns(IUD):
-            if section.has_patterns(REMOVE):
+            # these definitely have correct language
+            if section.has_patterns(REMOVE, PLAN):
+                # require either REMOVE/PLAN since this could have other refs
                 if section.has_patterns(TOOL):
-                    return RemoveStatus.TOOL_REMOVE, section.text
-                return RemoveStatus.REMOVE, section.text
+                    yield RemoveStatus.TOOL_REMOVE, section.text
+                if section.has_patterns(REMOVE):
+                    yield RemoveStatus.REMOVE, section.text
+                if section.has_patterns(PLAN):
+                    yield RemoveStatus.PLAN
             else:
                 section_text.append(section.text)
         if section_text:
-            return RemoveStatus.NONE, ' '.join(section_text)
+            yield RemoveStatus.NONE, ' '.join(section_text)
         else:
-            return RemoveStatus.SKIP, document.text
+            yield RemoveStatus.SKIP, document.text
     else:
-        return RemoveStatus.SKIP, document.text
+        yield RemoveStatus.SKIP, document.text
