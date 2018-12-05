@@ -4,7 +4,7 @@ from apex.algo.result import Status, Result
 
 in_place = r'(?<!not) in (place|situ)\b'
 negation = r'(ready|should|sometimes|must|decline|\bnot\b)'
-hypothetical = r'(option|possib\w+|desire|want|\bor\b|like|would|until|request)'
+hypothetical = r'(option|possib\w+|desire|want|will|\bor\b|like|would|until|request)'
 boilerplate = r'(risk|after your visit|chance|conceive|appt|appointment|due (to|for|at)|recommend|' \
               r'pregnan|pamphlet|schedul|doctor)'
 other = r'(fibroid|v25.13)'

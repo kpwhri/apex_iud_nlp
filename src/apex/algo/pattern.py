@@ -167,7 +167,8 @@ class Document:
                         sents.add(i + j)
                     if i - j >= 0:
                         sents.add(i - j)
-            yield Section([self.sentences[i] for i in sorted(list(sents))], self.matches)
+            if sents:
+                yield Section([self.sentences[i] for i in sorted(list(sents))], self.matches)
 
     def select_all_sentences_with_patterns(self, *pats, negation=None, has_all=False, get_range=False,
                                            neighboring_sentences=0):
