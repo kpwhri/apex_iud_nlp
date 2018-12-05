@@ -46,9 +46,16 @@ class FileWrapper:
 
     def writeline(self, line, sep=None):
         if sep:
-            self.fh.write(sep.join(str(s) for s in line) + '\n')
+            self.fh.write(sep.join(self.clean_list(line)) + '\n')
         else:
             self.fh.write(str(line) + '\n')
+
+    def clean(self, val):
+        return str(val).replace('\n', ' ~~')
+
+    def clean_list(self, lst):
+        for el in lst:
+            yield self.clean(el)
 
 
 class CsvFileWrapper(FileWrapper):
@@ -70,7 +77,7 @@ class CsvFileWrapper(FileWrapper):
 
     def writeline(self, line, **kwargs):
         if self.writer:
-            self.writer.writerow(line)
+            self.writer.writerow(self.clean_list(line))
 
 
 class TsvFileWrapper(FileWrapper):

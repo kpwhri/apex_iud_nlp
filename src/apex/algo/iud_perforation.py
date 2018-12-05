@@ -3,7 +3,7 @@ from apex.algo.result import Result, Status
 
 iuds = r'\b(iuds?|intrauterine( contraceptive)? devices?)'
 lng_iuds = r'(lng ius|levonorgestrel( (releasing|rlse))? (intrauterine|us))'
-brand = r'(mirena|paragu?ard|skyla|liletta|copper)'
+brand = r'(mirena|paragu?ard|skyla\b|lilett?a|kyleena|copper)'
 embedded = r'([ie]mbedded|impacted)'
 # removed: |foreign body
 migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+|(intra)?peritoneal)'
