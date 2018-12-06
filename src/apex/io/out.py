@@ -93,7 +93,7 @@ class TableWrapper:
 
     def __init__(self, tablename, driver, server, database, **kwargs):
         self.eng = sqlai.get_engine(driver=driver, server=server, database=database)
-        self.tablename = f'{tablename}_{DATETIME_STR}'
+        self.tablename = f'{tablename}'
 
     def __enter__(self):
         self.eng.execute(f'create table {self.tablename} '

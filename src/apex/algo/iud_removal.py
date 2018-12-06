@@ -22,7 +22,7 @@ REMOVE = Pattern(r'(remov\w+|replac\w+)',
 # describe tool or the "how" of removal
 TOOL = Pattern(r'((ring )?forceps?|hook|speculum|fashion|'
                r'strings? (grasp|clasp)|(grasp|clasp)\w* strings?|'
-               r'(with|gentle|more|\bw) traction)')
+               r'(with|gentle|more|\bw) traction|technique)')
 PLAN = Pattern(r'\brem intrauterine device\b',
                negates=[hypothetical, boilerplate, negation, other, safe_hypo_may])
 

@@ -4,8 +4,10 @@ from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 
-hypothetical = r'(risks?|benefits?|\bvs\b|\bor\b|questions?)'
-negative = r'(cannot)'
+hypothetical = r'(risks?|benefits?|\bvs\b|\bor\b|questions?|please|stocked|order|' \
+               r'pamphlet|brochure|\bif\b|option|availab|decid|plan|interest|consult|' \
+               r'want|desir[ei]\w*|appt|appointment|can|could|would)'
+negative = r'(cannot|\bnot\b)'
 PARAGARD = Pattern(r'(paragu?ard)', negates=[hypothetical])
 MIRENA = Pattern(r'(mirena)', negates=[hypothetical])
 LILETTA = Pattern(r'(lilett?a)', negates=[hypothetical])
@@ -15,7 +17,9 @@ COPPER = Pattern(r'(copper) (\w+ )?iu[sd]\b', negates=[hypothetical])
 LNG = Pattern(r'(levonorgestrel|lng) (\w+ )?iu[sd]\b',
               negates=['oral tab', hypothetical])
 IUD = (PARAGARD, MIRENA, LILETTA, KYLEENA, SKYLA, COPPER, LNG)
-USING = Pattern(r'(ha[sd]|us(es?|ing)|insert(ed|ion)|contracepti(on|ve))',
+# not sure how to use? e.g., 'skyla in place but pain exam scheduled [date]'
+SCHEDULED = Pattern(r'schedul\w+', negates=['today'])
+USING = Pattern(r'(ha[sd]|us(es?|ing)|insert(ed|ion)|contracepti(on|ve)|in place|(re)?placed)',
                 negates=['(expel|remove)'])
 
 
@@ -63,6 +67,7 @@ def determine_iud_brand(document: Document):
     if document.has_patterns(*IUD):
         brands = []
         for section in document.select_sentences_with_patterns(*IUD, neighboring_sentences=1):
+            # scheduled = bool(section.has_patterns(SCHEDULED))
             if section.has_patterns(PARAGARD, COPPER):
                 brands.append((BrandStatus.PARAGARD, section.has_patterns(USING), section.text))
             if section.has_patterns(MIRENA):

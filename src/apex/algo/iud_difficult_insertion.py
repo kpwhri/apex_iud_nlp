@@ -1,14 +1,14 @@
-from apex.algo.iud_perforation import IUD
 from apex.algo.pattern import Document, Pattern
-from apex.algo.result import Status
+from apex.algo.result import Status, Result
 
+negation = r'(\bor\b|without|\bno\b)'
 
 INSERTION = Pattern(r'insert(ed|ion)')
-PROVIDER = Pattern(r'(((difficult|complicated)( \w+)? insertion)|insertion( \w+)? (difficult|complicated))')
-US_GUIDE = Pattern(r'(u/s|ultrasound) guid(ed?|ance)')
-CERV_DIL = Pattern(r'')
-PARACERV = Pattern(r'lidocaine')
-MISPROSTOL = Pattern(r'cytotec')
+PROVIDER = Pattern(r'(difficult|complicat\w*|(with|more) traction)', negates=[negation])
+US_GUIDE = Pattern(r'(u/?s|ultrasound) guid(ed?|ance)')
+CERV_DIL = Pattern(r'(cervical (dilat|ripen)\w+|(dilat|ripen)\w*( of)?( the?) cervix)')
+PARACERV = Pattern(r'(lidocaine|xylocaine|lignocaine|paracervical block|anesthe)')
+MISPROSTOL = Pattern(r'(cytotec|misoprostol)')
 
 
 class DiffInsStatus(Status):
@@ -22,7 +22,8 @@ class DiffInsStatus(Status):
 
 
 def confirm_difficult_insertion(document: Document, expected=None):
-    determine_difficult_insertion(document)
+    for status, text in determine_difficult_insertion(document):
+        yield Result(status, status.value, expected, text)
 
 
 def determine_difficult_insertion(document: Document):
@@ -30,8 +31,26 @@ def determine_difficult_insertion(document: Document):
     :param document:
     :return:
     """
-    if document.has_patterns(PROVIDER, ignore_negation=True):
-        for section in document.select_sentences_with_patterns(IUD):
+    if document.has_patterns(INSERTION, ignore_negation=True):
+        found = False
+        for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
+            if section.has_patterns(PROVIDER):
+                yield DiffInsStatus.PROVIDER_STATEMENT, section.text
+                found = True
+            if section.has_patterns(US_GUIDE):
+                yield DiffInsStatus.ULTRASOUND_GUIDANCE, section.text
+                found = True
+            if section.has_patterns(PARACERV):
+                yield DiffInsStatus.PARACERVICAL_BLOCK, section.text
+                found = True
+            if section.has_patterns(MISPROSTOL):
+                yield DiffInsStatus.MISOPROSTOL, section.text
+                found = True
+            if section.has_patterns(CERV_DIL):
+                yield DiffInsStatus.CERVICAL_DILATION, section.text
+                found = True
+        if not found:
             pass
+            # yield DiffInsStatus.NONE, document.text
     else:
-        return DiffInsStatus.NONE  # change to skip
+        yield DiffInsStatus.SKIP, None  # change to skip
