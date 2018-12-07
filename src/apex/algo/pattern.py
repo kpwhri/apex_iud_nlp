@@ -130,6 +130,8 @@ class Document:
         if file:
             with open(file, encoding=encoding) as fh:
                 self.text = fh.read()
+        if not text:
+            raise ValueError('Missing text')
         self.sentences = [Sentence(x, self.matches) for x in self.text.split('\n') if x.strip()]
 
     def has_pattern(self, pat, ignore_negation=False):
@@ -138,12 +140,21 @@ class Document:
             self.matches.add(m)
         return bool(m)
 
-    def get_pattern(self, pat, index):
+    def get_pattern(self, pat, index=0):
         m = pat.matches(self.text)
         if m:
             self.matches.add(m)
-            return m.group(index)
+            if not isinstance(index, (list, tuple)):
+                index = (index,)
+            return m.group(*index)
         return m
+
+    def get_patterns(self, *pats, index=0):
+        for pat in pats:
+            res = self.get_pattern(pat, index=index)
+            if res:
+                return res
+        return None
 
     def has_patterns(self, *pats, has_all=False, ignore_negation=False):
         for pat in pats:

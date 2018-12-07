@@ -14,7 +14,11 @@ JSON_SCHEMA = {
                     'type': 'array',
                     'items': {'type': 'string'}
                 },
-                'version': {'type': 'string'}  # text or lemma
+                'version': {'type': 'string'},  # text or lemma
+                'name': {'type': 'string'},
+                'driver': {'type': 'string'},
+                'server': {'type': 'string'},
+                'database': {'type': 'string'},
             }
         },
         'annotation': {
