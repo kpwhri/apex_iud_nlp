@@ -15,10 +15,20 @@ JSON_SCHEMA = {
                     'items': {'type': 'string'}
                 },
                 'version': {'type': 'string'},  # text or lemma
-                'name': {'type': 'string'},
-                'driver': {'type': 'string'},
-                'server': {'type': 'string'},
-                'database': {'type': 'string'},
+                'connections': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'name': {'type': 'string'},
+                            'driver': {'type': 'string'},
+                            'server': {'type': 'string'},
+                            'database': {'type': 'string'},
+                            'name_col': {'type': 'string'},
+                            'text_col': {'type': 'string'}
+                        }
+                    }
+                },
             }
         },
         'annotation': {

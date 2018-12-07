@@ -18,25 +18,33 @@ def get_next_from_directory(directory, directories, version):
                 yield doc_name, entry.path, None
 
 
-def get_next_from_sql(name, driver, server, database, name_col, text_col):
-    if name and driver and server and database:
-        eng = sqlai.get_engine(driver=driver, server=server, database=database)
-        for doc_name, text in eng.execute(f'select {name_col}, {text_col} from {name}'):
+def get_next_from_connections(*connections):
+    for connection in connections:
+        for doc_name, text in get_next_from_sql(**connection):
             yield doc_name, None, text
 
 
-def get_next_from_corpus(directory=None, directories=None, version=None,
-                         name=None, driver=None, server=None, database=None,
-                         name_col=None, text_col=None,
-                         skipper=None, start=0, end=None):
+def get_next_from_sql(name=None, driver=None, server=None,
+                      database=None, name_col=None, text_col=None):
     """
-
     :param name_col:
     :param text_col:
     :param name: tablename (if connecting to database)
     :param driver: db driver  (if connecting to database)
     :param server: name of server (if connecting to database)
     :param database: name of database (if connecting to database)
+    """
+    if name and driver and server and database:
+        eng = sqlai.get_engine(driver=driver, server=server, database=database)
+        for doc_name, text in eng.execute(f'select {name_col}, {text_col} from {name}'):
+            yield doc_name, text
+
+
+def get_next_from_corpus(directory=None, directories=None, version=None,
+                         connections=None, skipper=None, start=0, end=None):
+    """
+
+    :param connections:
     :param directories: list of directories to look through
     :param skipper:
     :param directory: first to look through (for backwards compatibility)
@@ -48,7 +56,7 @@ def get_next_from_corpus(directory=None, directories=None, version=None,
     i = -1
     for doc_name, path, text in itertools.chain(
         get_next_from_directory(directory, directories, version),
-        get_next_from_sql(name, driver, server, database, name_col, text_col)
+        get_next_from_connections(*connections)
     ):
         if skipper and doc_name in skipper:
             continue
