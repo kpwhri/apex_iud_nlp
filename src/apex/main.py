@@ -29,6 +29,8 @@ def process(corpus=None, annotation=None, output=None, select=None, algorithm=No
             loginfo=None, skipinfo=None):
     truth = parse_annotation_file(**kw(annotation))
     algos = get_algorithms(**kw(algorithm))
+    if not algos:
+        raise ValueError('No algorithms specified!')
     results = {name: Reporter() for name in algos}
     with get_file_wrapper(**output) as out, \
             get_logging(**kw(loginfo)) as log, \

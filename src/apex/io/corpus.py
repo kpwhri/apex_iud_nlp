@@ -57,7 +57,7 @@ def get_next_from_corpus(directory=None, directories=None, version=None,
             continue
         elif end and i >= end:
             break
-        if not text or not path:  # one of these required
+        if not text and not path:  # one of these required
             continue
         yield Document(doc_name, file=path, text=text)
 

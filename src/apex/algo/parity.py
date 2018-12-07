@@ -2,18 +2,18 @@ from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result, Status
 
 
-GRAVIDA_0 = Pattern(r'(\b(g|grav\w*) 0|'
+GRAVIDA_0 = Pattern(r'(\b(g|grav\w*) 0\W|'
                     r'grav para term preterm abortions tab sab ect mult living 0)')
 PARA_0 = Pattern(r'(\bg \d{1,2} p 0|'
-                 r'g \d{1,2}.{0,20}? p 0|'
-                 r'para (0|zero|none|na)|'
+                 r'g \d{1,2} p 0|'
+                 r'para (0|zero|none|na)\b|'
                  r'grav para term preterm abortions tab sab ect mult living \d 0)')
-NULLIPAROUS = Pattern(r'(virginal|null?i?(par[ao]|grav))')
-MULTIPAROUS = Pattern(r'(multipar|c(ervi)?x( \w+){0,5} par[ao])')
+NULLIPAROUS = Pattern(r'(virginal|null?i?(par(a|ity|ous)|grav))')
+MULTIPAROUS = Pattern(r'(multipar(a|ity|ous)]|c(ervi)?x\b( \w+){0,5} par(a|ous|ity)\b)')
 CHILD_0 = Pattern(r'children: (none|0)')
 
 PARA_N = Pattern(r'(?:\bg \d{1,2} p (\d)|'
-                 r'g \d{1,2}.{0,20}? p (\d)|'
+                 r'g \d{1,2} p (\d)|'
                  r'para (\d)|'
                  r'grav para term preterm abortions tab sab ect mult living \d (\d))')
 CHILD_NUM = Pattern(r'children: ([1-9])')
@@ -42,7 +42,7 @@ class ParityStatus(Status):
 
 def get_parity(document: Document, expected=None):
     status, text = determine_parity(document)
-    return Result(status, status.value, expected, text)
+    yield Result(status, status.value, expected, text)
 
 
 def determine_parity(document: Document):
@@ -52,11 +52,12 @@ def determine_parity(document: Document):
     res = document.get_patterns(PARA_N, CHILD_N, CHILD_NUM, index=(0, 1))
     if res:
         text, captured = res
-        status = extract_status(captured)
-        if status:
-            return status, text
-        else:
-            print(status, text)
+        if captured:
+            status = extract_status(captured)
+            if status:
+                return status, text
+            else:
+                print(status, text)
     text = document.get_patterns(MULTIPAROUS)
     if text:
         return ParityStatus.MULTIPAROUS, text
@@ -64,7 +65,7 @@ def determine_parity(document: Document):
 
 
 def extract_status(captured):
-    captured = captured.strip()
+    captured = captured.strip().lower()
     if captured in ('1', 'one'):
         return ParityStatus.P1
     if captured in ('2', 'two', 'twice'):
