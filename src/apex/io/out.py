@@ -25,7 +25,7 @@ class NullFileWrapper:
 
 class FileWrapper:
 
-    def __init__(self, file, path=None, header=None, **kwargs):
+    def __init__(self, file, path=None, header=None, encoding='utf8', **kwargs):
         if path:
             self.fp = os.path.join(path, file)
             os.makedirs(path, exist_ok=True)
@@ -33,10 +33,11 @@ class FileWrapper:
             self.fp = file
         self.fh = None
         self.header = header or []
+        self.encoding = encoding
 
     def __enter__(self):
         if self.fp:
-            self.fh = open(self.fp, 'w')
+            self.fh = open(self.fp, 'w', encoding=self.encoding)
             self.writeline(self.header)
         return self
 
@@ -48,7 +49,7 @@ class FileWrapper:
         if sep:
             self.fh.write(sep.join(self.clean_list(line)) + '\n')
         else:
-            self.fh.write(str(line) + '\n')
+            self.fh.write(self.clean(line) + '\n')
 
     def clean(self, val):
         return str(val).replace('\n', ' ~~')
