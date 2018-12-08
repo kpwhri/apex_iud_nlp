@@ -189,8 +189,8 @@ class Document:
         if file:
             with open(file, encoding=encoding) as fh:
                 self.text = fh.read()
-        if not text:
-            raise ValueError('Missing text')
+        if not self.text:
+            raise ValueError(f'Missing text for {name}')
         self.sentences = [Sentence(x, self.matches) for x in self.text.split('\n') if x.strip()]
 
     def has_pattern(self, pat, ignore_negation=False):

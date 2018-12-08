@@ -9,13 +9,20 @@ from apex.schema import validate_config
 from apex.util import kw
 
 
-def parse_annotation_file(file=None):
-    data = defaultdict(lambda: None)
+def parse_annotation_file(file=None, data=None):
+    if not data:
+        data = defaultdict(lambda: None)
     if file:
         with open(file) as fh:
             for line in fh:
                 name, res, *comments = line.strip().split()
                 data[name] = int(res)
+    return data
+
+
+def parse_annotation_files(*configs, data=None):
+    for config in configs:
+        data = parse_annotation_file(data=data, **kw(config))
     return data
 
 
@@ -25,9 +32,10 @@ def get_algorithms(names=None):
     return {x: ALGORITHMS[x] for x in ALGORITHMS if x in names}
 
 
-def process(corpus=None, annotation=None, output=None, select=None, algorithm=None,
-            loginfo=None, skipinfo=None):
+def process(corpus=None, annotation=None, annotations=None, output=None, select=None,
+            algorithm=None, loginfo=None, skipinfo=None):
     truth = parse_annotation_file(**kw(annotation))
+    truth = parse_annotation_files(*annotations or list(), data=truth)
     algos = get_algorithms(**kw(algorithm))
     if not algos:
         raise ValueError('No algorithms specified!')

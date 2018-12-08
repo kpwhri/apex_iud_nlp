@@ -37,6 +37,15 @@ JSON_SCHEMA = {
                 'file': {'type': 'string'}
             }
         },
+        'annotations': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'file': {'type': 'string'}
+                }
+            }
+        },
         'output': {
             'type': 'object',
             'properties': {

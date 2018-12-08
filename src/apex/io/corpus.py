@@ -56,7 +56,7 @@ def get_next_from_corpus(directory=None, directories=None, version=None,
     i = -1
     for doc_name, path, text in itertools.chain(
         get_next_from_directory(directory, directories, version),
-        get_next_from_connections(*connections)
+        get_next_from_connections(*connections or list())
     ):
         if skipper and doc_name in skipper:
             continue
