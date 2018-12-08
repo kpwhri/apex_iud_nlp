@@ -2,9 +2,47 @@ import re
 from copy import copy
 
 
+class Match:
+
+    def __init__(self, match, groups=None):
+        self.match = match
+        self._groups = groups
+
+    def group(self, *index):
+        if not self._groups or not index or len(index) == 1 and index[0] == 0:
+            return self.match.group(*index)
+        res = []
+        if not isinstance(index, tuple):
+            index = (index,)
+        for idx in index:
+            if idx == 0:
+                res.append(self.match.group())
+            else:
+                res.append(self._groups[idx-1])
+
+    def groups(self):
+        if not self._groups:
+            return self.match.groups()
+        else:
+            return tuple(self._groups)
+
+
 class Pattern:
 
-    def __init__(self, pattern, negates=None, space_replace=r'\W*', flags=re.IGNORECASE):
+    def __init__(self, pattern, negates=None, space_replace=r'\W*',
+                 capture_length=None,
+                 flags=re.IGNORECASE):
+        """
+
+        :param pattern:
+        :param negates:
+        :param space_replace:
+        :param capture_length: for 'or:d' patterns, this is the number
+            of actual capture groups (?:(this)|(that)|(thes))
+            has capture_length = 1
+            None: i.e., capture_length == max
+        :param flags:
+        """
         if space_replace:
             pattern = space_replace.join(pattern.split(' '))
         self.pattern = re.compile(pattern, flags)
@@ -13,6 +51,7 @@ class Pattern:
             if space_replace:
                 negate = space_replace.join(negate.split(' '))
             self.negates.append(re.compile(negate, flags))
+        self.capture_length = capture_length
 
     def matches(self, text, ignore_negation=False):
         m = self.pattern.search(text)
@@ -21,8 +60,21 @@ class Pattern:
                 for negate in self.negates:
                     if negate.search(text):
                         return False
-            return m
+
+            return Match(m, groups=self._compress_groups(m))
         return False
+
+    def _compress_groups(self, m):
+        if self.capture_length:
+            groups = m.groups()
+            assert len(groups) % self.capture_length == 0
+            for x in zip(*[iter(m.groups())] * self.capture_length):
+                if x[0] is None:
+                    continue
+                else:
+                    return x
+        else:
+            return None
 
     def matchgroup(self, text, index=0):
         m = self.matches(text)
@@ -124,6 +176,13 @@ class Section:
 class Document:
 
     def __init__(self, name, file=None, text=None, encoding='utf8'):
+        """
+
+        :param name:
+        :param file:
+        :param text:
+        :param encoding:
+        """
         self.name = name
         self.text = text
         self.matches = MatchCask()
@@ -149,10 +208,20 @@ class Document:
             return m.group(*index)
         return m
 
-    def get_patterns(self, *pats, index=0):
-        for pat in pats:
+    def get_patterns(self, *pats, index=0, names=None):
+        """
+
+        :param pats:
+        :param index:
+        :param names: if included, return name of matched pattern
+            list same length as number of patterns
+        :return:
+        """
+        for i, pat in enumerate(pats):
             res = self.get_pattern(pat, index=index)
             if res:
+                if names:
+                    return res, names[i]
                 return res
         return None
 

@@ -5,6 +5,10 @@ class Status(enum.Enum):
     pass
 
 
+class Source(enum.Enum):
+    pass
+
+
 class DefaultStatus(Status):
     SKIP = 99
 
@@ -35,7 +39,7 @@ class Result:
 
     @property
     def extras(self):
-        return ','.join(self._extras)
+        return ','.join(x.name if isinstance(x, enum.Enum) else str(x) for x in self._extras)
 
     @property
     def text(self):
