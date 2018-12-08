@@ -94,6 +94,7 @@ def determine_parity(document: Document):
             if status:
                 return status, text, src
             else:
+                # e.g., "para 13 %", "multipara @ 32+2/6weeks
                 logging.info(f'Unrecognized parity value for {document.name}: {status} in "{text}" from {src}')
     text = document.get_patterns(MULTIPAROUS)
     if text:
