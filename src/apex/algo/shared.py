@@ -18,7 +18,7 @@ IUD = Pattern(f'({iuds}|{lng_iuds}|{brand})')
 boilerplate = r'\b(complication|pamphlet|warning|information|review|side effect|counsel|\bsign|infection|ensure|' \
               r'cramps|risk|\bif\b|after your visit|conceive|appt|appointment|due (to|for|at)|recommend|' \
               r'pregnan|pamphlet|schedul|doctor|contact|\brare|\bhow\b|\bcall|includ|failure|' \
-              r'associated|avoid)'
+              r'associated|avoid|instruct|guideline)'
 possible = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|suspect|chance|may\b|afraid|concern|tentative)'
 POSSIBLE = Pattern(possible)
 negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b)'
@@ -29,4 +29,4 @@ safe_may = r'(?<!in|st|ce) may (?!\d)'
 hypothetical = r'(option|possib\w+|desire|want|will|\bcan\b|' \
                r'\bor\b|like|would|need|until|request|when|you ll|' \
                r'\bif\b|consider|concern|return|nervous|anxious|to be remov|could|' \
-               r'discuss|inform|should)'
+               r'discuss|inform|should|\btry)'
