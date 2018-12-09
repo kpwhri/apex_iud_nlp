@@ -48,7 +48,7 @@ def process(corpus=None, annotation=None, annotations=None, output=None, select=
                 max_res = None
                 for res in alg_func(doc, truth[doc.name]):
                     if res:
-                        out.writeline([doc.name, name, res.result, res.value, res.extras])
+                        out.writeline([doc.name, name, res.result, res.value, res.date, res.extras])
                     elif res.is_skip():  # always skip
                         skipper.add(doc.name)
                         break

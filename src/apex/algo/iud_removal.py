@@ -1,24 +1,15 @@
-from apex.algo.iud_perforation import IUD
+from apex.algo.shared import IUD, boilerplate, safe_may, hypothetical
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 in_place = r'(?<!not) in (place|situ)\b'
 negation = r'(ready|should|sometimes|must|decline|\bnot\b)'
-hypothetical = r'(option|possib\w+|desire|want|will|\bcan\b|' \
-               r'\bor\b|like|would|need|until|request|when|you ll|' \
-               r'\bif\b|consider|concern|return|nervous|anxious|to be remov|could|' \
-               r'discuss|inform)'
-boilerplate = r'(risk|after your visit|chance|conceive|appt|appointment|due (to|for|at)|recommend|' \
-              r'pregnan|pamphlet|schedul|doctor)'
 other = r'(fibroid|v25.1\d|tampon)'
 tool_remove = r'(introducer|inserter|tenaculum|instruments?)( (was|were))? removed'
-# avoid months (followed by day/year)
-# avoid 'last' or 'in' or 'since'
-safe_hypo_may = r'(?<!in|st|ce) may (?!\d)'
 
 REMOVE = Pattern(r'(remov\w+|replac\w+)',
                  negates=[negation, boilerplate, hypothetical, in_place,
-                          other, tool_remove, safe_hypo_may])
+                          other, tool_remove, safe_may])
 # describe tool or the "how" of removal
 TOOL = Pattern(r'((ring )?forceps?|hook|speculum|fashion|'
                r'strings? (grasp|clasp)|(grasp|clasp)\w* strings?|'

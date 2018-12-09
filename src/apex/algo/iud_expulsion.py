@@ -1,37 +1,32 @@
-from apex.algo.iud_perforation import IUD
+from apex.algo.shared import IUD, POSSIBLE, boilerplate, hypothetical, historical, negation
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 
-possible = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|suspect|chance|may\b|afraid|concern|tentative)'
-hypothetical = r'(\bif\b|\bnose\b|contact|doctor|should|can|includ|failure|' \
-               r'how|call|rare|risk|associated|avoid)'
-historical = r'(hx|history|previous)'
-negation = r'(\bnot\b|\bor\b|\bno\b)'
+nose = r'\bnose\b'
 
-POSSIBLE = Pattern(possible)
 INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|bad|\bmal\b)',
-                    negates=[hypothetical, negation])
+                    negates=[nose, hypothetical, negation, boilerplate])
 PLACEMENT = Pattern(r'(plac\w+|position\w*|location)',
-                    negates=[hypothetical, negation])
+                    negates=[nose, hypothetical, negation, boilerplate])
 MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
-                      negates=[hypothetical, negation])
+                      negates=[nose, hypothetical, negation, boilerplate])
 DISPLACEMENT = Pattern(r'(\brotat\w+|(lower|inferior) (uter(ine|us)|cervi(x|cal))|'
                        r'displac\w+|dislodg\w+)',
-                       negates=[hypothetical, negation, historical])
+                       negates=[nose, hypothetical, negation, historical, boilerplate])
 EXPULSION = Pattern(r'(expel|expuls)',
-                    negates=[hypothetical, historical, negation])
+                    negates=[nose, hypothetical, historical, negation, boilerplate])
 DEF_EXPULSION = Pattern(r'spontan\w+ (expel|expul)',
-                        negates=[hypothetical, historical, negation])
+                        negates=[nose, hypothetical, historical, negation, boilerplate])
 PARTIAL_EXP = Pattern(r'(partial\w* (expel|expul)|(expel|expul)\w* partial)',
-                      negates=[negation, 'strings? of'])
+                      negates=[nose, negation, 'strings? of', boilerplate])
 VISUALIZED = Pattern(r'({IUD})( was)? (seen|visualiz)',
-                     negates=[negation, hypothetical])
+                     negates=[nose, negation, hypothetical, boilerplate])
 PROTRUDES = Pattern(r'protrud',
-                    negates=['strings?', hypothetical])
+                    negates=['strings?', nose, hypothetical, boilerplate])
 LOST = Pattern(r'(toilet|fell)')
 MISSING = Pattern(r'(missing|lost|can(no|\W)?t feel)',
-                  negates=[hypothetical])
+                  negates=[nose, hypothetical, boilerplate])
 STRINGS = Pattern(r'strings?', negates=['bothersome'])
 ANY = (PLACEMENT, MALPOSITION, EXPULSION, LOST, MISSING,
        PROTRUDES, VISUALIZED, PARTIAL_EXP, DEF_EXPULSION)
