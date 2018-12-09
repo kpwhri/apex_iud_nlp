@@ -20,11 +20,11 @@ boilerplate = r'\b(complication|pamphlet|warning|information|review|side effect|
               r'cramps|risk|\bif\b|after your visit|conceive|appt|appointment|due (to|for|at)|recommend|' \
               r'pregnan|pamphlet|schedul|doctor|contact|\brare|\bhow\b|\bcall|includ|failure|' \
               r'associated|avoid|instruct|guideline)'
-possible = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|susp(ect|icious)|' \
-           r'chance|may\b|afraid|concern|tentative|doubt)'
+possible = r'\b(unlikely|\bposs\b|possib(ly|le|ility)|improbable|potential|susp(ect|icious)|' \
+           r'chance|may\b|afraid|concern|tentative|doubt|thought|think)'
 POSSIBLE = Pattern(possible)
 negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b)'
-historical = r'(history|previous|hx|past)'
+historical = r'(history|previous|\bhx\b|\bpast\b|\bh/o\b)'
 # avoid months (followed by day/year)
 # avoid 'last' or 'in' or 'since'
 safe_may = r'(?<!in|st|ce) may (?!\d)'
