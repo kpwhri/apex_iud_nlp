@@ -24,7 +24,7 @@ TOOL = Pattern(r'((ring )?forceps?|hook|speculum|fashion|'
                r'strings? (grasp|clasp)|(grasp|clasp)\w* strings?|'
                r'(with|gentle|more|\bw) traction|technique)')
 PLAN = Pattern(r'\brem intrauterine device\b',
-               negates=[hypothetical, boilerplate, negation, other, safe_hypo_may])
+               negates=[])
 
 
 class RemoveStatus(Status):
@@ -35,23 +35,13 @@ class RemoveStatus(Status):
     SKIP = 99
 
 
-def classify_result(res: RemoveStatus):
-    if res == RemoveStatus.REMOVE:
-        return 1
-    elif res == RemoveStatus.TOOL_REMOVE:
-        return 2
-    else:
-        return -1
-
-
 def confirm_iud_removal(document: Document, expected=None):
     for value, text in determine_iud_removal(document):
-        res = classify_result(value)
-        yield Result(value, res, expected, text)
+        yield Result(value, value.value, expected, text)
 
 
 def determine_iud_removal(document: Document):
-    if document.has_patterns(REMOVE, ignore_negation=True):
+    if document.has_patterns(REMOVE, PLAN, ignore_negation=True):
         section_text = []
         for section in document.select_sentences_with_patterns(IUD):
             # these definitely have correct language
