@@ -15,15 +15,17 @@ class DefaultStatus(Status):
 
 class Result:
 
-    __slots__ = ['_value', 'result', 'expected', '_text', 'correct', '_extras']
+    __slots__ = ['_value', 'result', 'expected', '_text', 'correct',
+                 '_extras', 'date']
 
-    def __init__(self, value: Status, result, expected=None,
-                 text=None, extras=None):
+    def __init__(self, value: Status, result=None, expected=None,
+                 text=None, date=None, extras=None):
         self._value = value
-        self.result = result
+        self.result = result or value.value
         self.expected = expected
         self._text = text
         self.correct = None
+        self.date = date
         if not extras:
             self._extras = list()
         elif isinstance(extras, list):
