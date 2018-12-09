@@ -3,7 +3,7 @@ from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 
-nose = r'\bnose\b'
+nose = r'(\bnose\b|%)'
 
 INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|bad|\bmal\b)',
                     negates=[nose, hypothetical, negation, boilerplate])
@@ -24,7 +24,8 @@ VISUALIZED = Pattern(r'({IUD})( was)? (seen|visualiz)',
                      negates=[nose, negation, hypothetical, boilerplate])
 PROTRUDES = Pattern(r'protrud',
                     negates=['strings?', nose, hypothetical, boilerplate])
-LOST = Pattern(r'(toilet|fell)')
+LOST = Pattern(r'(toilet|fell)',
+               negates=['paper', '%'])
 MISSING = Pattern(r'(missing|lost|can(no|\W)?t feel)',
                   negates=[nose, hypothetical, boilerplate])
 STRINGS = Pattern(r'strings?', negates=['bothersome'])
