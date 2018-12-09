@@ -1,4 +1,4 @@
-from apex.algo.shared import IUD, POSSIBLE, boilerplate, hypothetical, historical, negation
+from apex.algo.shared import IUD, POSSIBLE, boilerplate, hypothetical, historical, negation, in_place
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
@@ -10,10 +10,10 @@ INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|bad|\bmal\b)',
 PLACEMENT = Pattern(r'(plac\w+|position\w*|location)',
                     negates=[nose, hypothetical, negation, boilerplate])
 MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
-                      negates=[nose, hypothetical, negation, boilerplate])
+                      negates=[nose, hypothetical, negation, boilerplate, in_place])
 DISPLACEMENT = Pattern(r'(\brotat\w+|(lower|inferior) (uter(ine|us)|cervi(x|cal))|'
                        r'displac\w+|dislodg\w+)',
-                       negates=[nose, hypothetical, negation, historical, boilerplate])
+                       negates=[nose, hypothetical, negation, historical, boilerplate, in_place])
 EXPULSION = Pattern(r'(expel|expuls)',
                     negates=[nose, hypothetical, historical, negation, boilerplate])
 DEF_EXPULSION = Pattern(r'spontan\w+ (expel|expul)',
