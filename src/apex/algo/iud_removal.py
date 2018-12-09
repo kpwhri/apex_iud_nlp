@@ -1,8 +1,7 @@
-from apex.algo.shared import IUD, boilerplate, safe_may, hypothetical
+from apex.algo.shared import IUD, boilerplate, safe_may, hypothetical, in_place
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
-in_place = r'(?<!not) in (place|situ)\b'
 negation = r'(ready|should|sometimes|must|decline|\bnot\b)'
 other = r'(fibroid|v25.1\d|tampon)'
 tool_remove = r'(introducer|inserter|tenaculum|instruments?)( (was|were))? removed'

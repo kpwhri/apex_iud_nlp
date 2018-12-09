@@ -1,17 +1,17 @@
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result, Status
-from apex.algo.shared import DATE_PAT, IUD, boilerplate, possible, negation, historical, POSSIBLE
+from apex.algo.shared import DATE_PAT, IUD, boilerplate, possible, negation, historical, POSSIBLE, in_place
 
 embedded = r'([ie]mbedded|impacted)'
 # removed: |foreign body
-migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+|(intra)?peritoneal)'
+migrated = r'\b(stuck|migrat\w+|extrauterine|omentum|displac\w+)'
 
 impact_neg = r'(cerumen|tympanic|ear|hormon\w+)'
 
 COMPLETE = Pattern('(intra (peritoneal|abdominal)|complete(ly)? perforat(ion|ed|e)s?)',
                    negates=[boilerplate, historical, negation, impact_neg])
 PERFORATION = Pattern(r'('
-                      r'perforat(ion|ed|e)s?|(pierc\w+|thr(ough|u))( the)?( uterine)? '
+                      r'perforat(ion|ed|e)s?|(pierc\w+|thr(ough|u)|into)( the)?( uterine)? '
                       r'(endometrium|wall|myometrium|serosa|perimetrium)'
                       r')',
                       negates=[boilerplate, historical, negation, impact_neg])
@@ -20,12 +20,12 @@ PARTIAL = Pattern(r'partial(ly)? perforat(ion|ed|e)s?',
 EMBEDDED = Pattern(f'({embedded})',
                    negates=[boilerplate, historical, possible, negation, impact_neg])
 MIGRATED = Pattern(f'{migrated}',
-                   negates=[boilerplate, historical, possible, negation])
+                   negates=[boilerplate, historical, possible, negation, 'strings?', in_place])
 LAPAROSCOPIC_REMOVAL = Pattern(r'('
                                r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\W+){0,10} remov\w+|'
                                r'remov\w+(\w+\W+){0,10}lap[ao]r[ao]scop\w+'
                                r')',
-                               negates=[historical, boilerplate])
+                               negates=[historical, boilerplate, 'hysterectomy'])
 ALL = (COMPLETE, PERFORATION, EMBEDDED, MIGRATED, LAPAROSCOPIC_REMOVAL)
 
 

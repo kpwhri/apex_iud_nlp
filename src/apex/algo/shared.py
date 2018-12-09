@@ -15,11 +15,13 @@ brand = r'(mirena|paragu?ard|skyla\b|lilett?a|kyleena|copper)'
 IUD = Pattern(f'({iuds}|{lng_iuds}|{brand})')
 
 # status annotation patterns
+in_place = r'(?<!not) in (place|situ)\b'
 boilerplate = r'\b(complication|pamphlet|warning|information|review|side effect|counsel|\bsign|infection|ensure|' \
               r'cramps|risk|\bif\b|after your visit|conceive|appt|appointment|due (to|for|at)|recommend|' \
               r'pregnan|pamphlet|schedul|doctor|contact|\brare|\bhow\b|\bcall|includ|failure|' \
               r'associated|avoid|instruct|guideline)'
-possible = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|suspect|chance|may\b|afraid|concern|tentative)'
+possible = r'\b(unlikely|possib(ly|le|ility)|improbable|potential|susp(ect|icious)|' \
+           r'chance|may\b|afraid|concern|tentative|doubt)'
 POSSIBLE = Pattern(possible)
 negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b)'
 historical = r'(history|previous|hx|past)'
