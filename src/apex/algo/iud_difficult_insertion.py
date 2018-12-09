@@ -1,12 +1,13 @@
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
+# don't include "not" "insertion not completed since..."
 negation = r'(\bor\b|without|\bno\b|w/?o|v25|pamphlet|brochure|possib)'
 past = r'(past|has had)'
 
 INSERTION = Pattern(r'insert(ed|ion)', negates=[past])
-PROVIDER = Pattern(r'(difficult|complicat\w*|(with|more) traction|'
-                   r'excessive instrument|challeng|'
+PROVIDER = Pattern(r'(difficult|\bcomplicat\w*|(with|more) traction|'
+                   r'excessive instrument|challeng|not complete|incomplete|'
                    r'cervi\w+ (stenosi|tight)|(stenosi|tight)\w+ cervi|'
                    r'severe flexion)',
                    negates=[negation])
