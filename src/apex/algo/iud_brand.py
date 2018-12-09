@@ -19,7 +19,7 @@ LNG = Pattern(r'(levonorgestrel|lng) (\w+ )?iu[sd]\b',
 IUD = (PARAGARD, MIRENA, LILETTA, KYLEENA, SKYLA, COPPER, LNG)
 # not sure how to use? e.g., 'skyla in place but pain exam scheduled [date]'
 SCHEDULED = Pattern(r'schedul\w+', negates=['today'])
-USING = Pattern(r'(ha[sd]|us(es?|ing)|insert(ed|ion)|contracepti(on|ve)|in place|(re)?placed)',
+USING = Pattern(r'(ha[sd]|us(es?|ing)|insert(ed|ion)|contracepti(on|ve)|in (situ|place)|(re)?placed)',
                 negates=['(expel|remove)'])
 
 
