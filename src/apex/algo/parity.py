@@ -7,14 +7,14 @@ GRAVIDA_0 = Pattern(r'(\b(g|grav\w*) 0\W|'
                     r'grav para term preterm abortions tab sab ect mult living 0)')
 PARA_0 = Pattern(r'(\bg \d{1,2} p 0|'
                  r'g \d{1,2} p 0|'
-                 r'para (0|zero|none|0\d\d\d)\b|'
+                 r'par(?:a|ity) (0|zero|none|0\d\d\d)\b|'
                  r'grav para term preterm abortions tab sab ect mult living \d{1,2} 0)')
 NULLIPAROUS = Pattern(r'(virginal|null?i?(par(a|ity|ous)|grav))')
 MULTIPAROUS = Pattern(r'(multipar(a|ity|ous)]|c(ervi)?x\b( \w+){0,5} par(a|ous|ity)\b)')
 CHILD_0 = Pattern(r'children: (none|0)')
 
 PARA_NNNN = Pattern(r'para (\d)\d\d\d')
-PARA_N = Pattern(r'para (\d{1,2})\b')
+PARA_N = Pattern(r'par(?:a|ity) p?(\d{1,2})\b')
 G_PARA_N = Pattern(r'(?:g(\d)p(\d)\d\d\d\W|'  # "x is a G2P1001 with ..."
                    r'\bg (\d{1,2}) p (\d{1,2})|'
                    r'g (\d{1,2}) p (\d{1,2})|'
