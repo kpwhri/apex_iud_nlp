@@ -7,7 +7,7 @@ from apex.algo.shared import hypothetical, negation, historical
 pain = r'(sore|pain\w*|infection|excoriat\w+|infection|yeast|candida|engorg\w+)'
 breast = r'(breast|nipple)'
 words_3 = r'( \w+){0,3} '
-ANY_BREAST = Pattern(r'(breast|nipple|milk|lactat\w+|\bbf\b|)')
+ANY_BREAST = Pattern(r'(breast|nipple|milk|lactat\w+|\bbf\b)')
 BREAST_PAIN = Pattern(f'({pain}{words_3}{breast}|{breast}{words_3}{pain})',
                       negates=[negation, hypothetical, historical])
 NIPPLE_SHIELD = Pattern(r'((us(es|ing)|wean\w+ from|yes|with)( the)? nipple shield|'
