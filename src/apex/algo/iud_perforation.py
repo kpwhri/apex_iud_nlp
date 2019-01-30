@@ -15,17 +15,17 @@ PERFORATION = Pattern(r'('
                       r'(endometrium|wall|myometrium|serosa|perimetrium)'
                       r')',
                       negates=[boilerplate, historical, negation, impact_neg])
-PARTIAL = Pattern(r'partial(ly)? perforat(ion|ed|e)s?',
+PARTIAL = Pattern(r'(partial(ly)? perforat(ion|ed|e)s?|arm broke)',
                   negates=[boilerplate, historical, possible, negation, impact_neg])
 EMBEDDED = Pattern(f'({embedded})',
                    negates=[boilerplate, historical, possible, negation, impact_neg])
 MIGRATED = Pattern(f'{migrated}',
                    negates=[boilerplate, historical, possible, negation, 'strings?', in_place])
 LAPAROSCOPIC_REMOVAL = Pattern(r'('
-                               r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\W+){0,10} remov\w+|'
-                               r'remov\w+(\w+\W+){0,10}lap[ao]r[ao]scop\w+'
+                               r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\W+){0,10} (remov|retriev)\w+|'
+                               r'(remov|retriev)\w+(\w+\W+){0,10}lap[ao]r[ao]scop\w+'
                                r')',
-                               negates=[historical, boilerplate, 'hysterectomy'])
+                               negates=[historical, boilerplate, 'hysterectomy', r'excis\w+', 'cysts?'])
 ALL = (COMPLETE, PERFORATION, EMBEDDED, MIGRATED, LAPAROSCOPIC_REMOVAL)
 
 
@@ -44,7 +44,8 @@ class PerforationStatus(Status):
 
 def confirm_iud_perforation(document: Document, expected=None):
     for value, text, date in determine_iud_perforation(document):
-        yield Result(value, value.value, expected, text, date=date)
+        if value.value in [1, 5, 7, 8]:
+            yield Result(value, value.value, expected, text, date=date)
 
 
 def determine_iud_perforation(document: Document):
