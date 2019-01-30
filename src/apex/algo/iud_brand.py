@@ -61,7 +61,8 @@ def get_iud_brand(document: Document, expected=None):
                 raise StopIteration
             brands = ((b, u, t) for b, u, t in brands if c[b] == v1[1])
     for brand, using, text in brands:
-        yield Result(brand, brand.value, expected, text=text)
+        if brand.value in [1, 2, 3, 4, 5, 6]:
+            yield Result(brand, brand.value, expected, text=text)
 
 
 def determine_iud_brand(document: Document):
