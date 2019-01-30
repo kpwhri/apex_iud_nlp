@@ -29,6 +29,13 @@ BF_BOILERPLATE = Pattern(r'(breastfeeding plan|most breastfeeding problems|use d
                          r'blocked milk ducts may cause|more frequent breastfeeding usually helps to increase|'
                          r'get some helpful pointers|not use a suppository while you|'
                          r'suddenly stopping breast feeding|'
+                         r'breast feeding for at least the first year|'
+                         r'introduce solid foods at the appropriate time|'
+                         r'the foods you eat may affect your breast milk|'
+                         r'always nurse baby with a deep latch|'
+                         r'breastmilk on the nipples|'
+                         r'breastmilk is the healthiest food for your baby|'
+                         r'we are happy to connect you with local resources|'
                          r'are considering stopping breastfeeding because)')
 BF_HISTORY = Pattern(r'(breastfeeding history: y)')
 BF_EXACT = Pattern(r'(breast feeding: y|breastfeeding: offered: y|taking breast: (y|(for )\d))')
@@ -84,8 +91,6 @@ def determine_breastfeeding(document: Document, expected=None):
         if section.has_patterns(BF_NO_EXACT):
             yield my_result(BreastfeedingStatus.NO, text=section.text)
             found_bf = True
-        if section.has_patterns(BREAST_PAIN):
-            yield my_result(BreastfeedingStatus.BREAST_PAIN, text=section.text)
         if section.has_patterns(EXPRESSED_MILK_EXACT):
             yield my_result(BreastfeedingStatus.EXPRESSED, text=section.text)
         if section.has_patterns(BF_HISTORY):
@@ -94,8 +99,6 @@ def determine_breastfeeding(document: Document, expected=None):
             yield my_result(BreastfeedingStatus.FORMULA, text=section.text)
         if section.has_patterns(FORMULA_NO):
             yield my_result(BreastfeedingStatus.NO_FORMULA, text=section.text)
-        if section.has_patterns(LACTATION_VISIT):
-            yield my_result(BreastfeedingStatus.LACTATION_VISIT, text=section.text)
         if section.has_patterns(PUMPING_EXACT):
             yield my_result(BreastfeedingStatus.PUMPING, text=section.text)
         if section.has_patterns(BOTTLE_EXACT):
@@ -109,3 +112,7 @@ def determine_breastfeeding(document: Document, expected=None):
                 yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
             if section.has_patterns(BREAST_MILK, BF, PUMPING, EXPRESSED_MILK):
                 yield my_result(BreastfeedingStatus.MAYBE, text=section.text)
+            if section.has_patterns(LACTATION_VISIT):
+                yield my_result(BreastfeedingStatus.LACTATION_VISIT, text=section.text)
+            if section.has_patterns(BREAST_PAIN):
+                yield my_result(BreastfeedingStatus.BREAST_PAIN, text=section.text)
