@@ -175,6 +175,8 @@ class Section:
 
 class Document:
 
+    HISTORY_REMOVAL = re.compile(r'HISTORY:.*?(?=[A-Z]+:)')
+
     def __init__(self, name, file=None, text=None, encoding='utf8'):
         """
 
@@ -191,7 +193,9 @@ class Document:
                 self.text = fh.read()
         if not self.text:
             raise ValueError(f'Missing text for {name}')
-        self.sentences = [Sentence(x, self.matches) for x in self.text.split('\n') if x.strip()]
+        # remove history section
+        new_text = self.HISTORY_REMOVAL.sub('\n', self.text)
+        self.sentences = [Sentence(x, self.matches) for x in new_text.split('\n') if x.strip()]
 
     def has_pattern(self, pat, ignore_negation=False):
         m = pat.matches(self.text, ignore_negation=ignore_negation)
