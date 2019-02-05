@@ -6,7 +6,7 @@ from cronkd.conn.db import sqlai
 from apex.algo.pattern import Document
 
 
-def get_next_from_directory(directory, directories, version):
+def get_next_from_directory(directory, directories, version, encoding='utf8'):
     if directory or directories:
         directories = directories or []
         if directory:
@@ -15,7 +15,9 @@ def get_next_from_directory(directory, directories, version):
             corpus_dir = os.path.join(directory, version)
             for entry in os.scandir(corpus_dir):
                 doc_name = entry.name.split('.')[0]
-                yield doc_name, entry.path, None
+                with open(entry.path, encoding=encoding) as fh:
+                    text = fh.read()
+                yield doc_name, None, text
 
 
 def get_next_from_connections(*connections):
