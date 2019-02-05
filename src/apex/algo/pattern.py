@@ -82,6 +82,9 @@ class Pattern:
             return m.group(0)
         return m
 
+    def sub(self, repl, text):
+        return self.pattern.sub(repl, text)
+
 
 class MatchCask:
 
@@ -192,10 +195,16 @@ class Document:
             with open(file, encoding=encoding) as fh:
                 self.text = fh.read()
         if not self.text:
-            raise ValueError(f'Missing text for {name}')
+            raise ValueError(f'Missing text for {name}, file: {file}')
         # remove history section
         new_text = self.HISTORY_REMOVAL.sub('\n', self.text)
         self.sentences = [Sentence(x, self.matches) for x in new_text.split('\n') if x.strip()]
+
+    def remove_patterns(self, *pats, ignore_negation=False):
+        text = self.text
+        for pat in pats:
+            text = pat.sub('', text)
+        return Document(self.name, text=text)
 
     def has_pattern(self, pat, ignore_negation=False):
         m = pat.matches(self.text, ignore_negation=ignore_negation)
