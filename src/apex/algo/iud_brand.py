@@ -22,6 +22,7 @@ IUD = (PARAGARD, MIRENA, LILETTA, KYLEENA, SKYLA, COPPER, LNG)
 SCHEDULED = Pattern(r'schedul\w+', negates=['today'])
 USING = Pattern(r'(ha[sd]|us(es?|ing)|insert(ed|ion)|iud type|contracepti(on|ve)|in (situ|place)|(re)?placed)',
                 negates=['(expel|remove)'])
+EXCLUDE = Pattern(r'(counsel|consent form|friends?|booklet)')
 
 
 class BrandStatus(Status):
@@ -57,7 +58,8 @@ def get_iud_brand(document: Document, expected=None):
         if len(c) > 1:  # still multiple brands
             v1, v2 = c.most_common(2)
             if v1[1] == v2[1]:  # equally frequent, likely hypothetical discussion
-                yield Result(BrandStatus.NONE, -1, expected, text=document.text)
+                if False:
+                    yield Result(BrandStatus.NONE, -1, expected, text=document.text)
                 raise StopIteration
             brands = ((b, u, t) for b, u, t in brands if c[b] == v1[1])
     for brand, using, text in brands:
@@ -66,6 +68,8 @@ def get_iud_brand(document: Document, expected=None):
 
 
 def determine_iud_brand(document: Document):
+    if document.has_patterns(EXCLUDE):
+        return [(BrandStatus.SKIP, False, None)]
     if document.has_patterns(*IUD, ignore_negation=True):
         brands = []
         for section in document.select_sentences_with_patterns(*IUD, neighboring_sentences=1):
