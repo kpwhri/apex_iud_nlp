@@ -52,6 +52,10 @@ class Pattern:
                 negate = space_replace.join(negate.split(' '))
             self.negates.append(re.compile(negate, flags))
         self.capture_length = capture_length
+        self.text = self.pattern.pattern
+
+    def __str__(self):
+        return self.text
 
     def matches(self, text, ignore_negation=False):
         m = self.pattern.search(text)
