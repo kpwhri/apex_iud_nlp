@@ -34,7 +34,7 @@ def get_algorithms(names=None):
 
 def process(corpus=None, annotation=None, annotations=None, output=None, select=None,
             algorithm=None, loginfo=None, skipinfo=None, logger=None):
-    if logger.get('verbose', False):
+    if logger and not logger['verbose']:
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
