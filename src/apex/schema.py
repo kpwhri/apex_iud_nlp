@@ -62,6 +62,11 @@ JSON_SCHEMA = {
             'properties': {
                 'start': {'type': 'number'},
                 'end': {'type': 'number'},
+                'encoding': {'type': 'string'},
+                'filenames': {
+                    'type': 'array',
+                    'items': {'type': 'string'}
+                }
             }
         },
         'algorithm': {
@@ -83,6 +88,12 @@ JSON_SCHEMA = {
                 'path': {'type': 'string'},
                 'rebuild': {'type': 'boolean'},
                 'ignore': {'type': 'boolean'},
+            }
+        },
+        'logger': {
+            'type': 'object',
+            'properties': {
+                'verbose': {'type': 'boolean'}
             }
         }
     }

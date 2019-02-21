@@ -33,7 +33,11 @@ def get_algorithms(names=None):
 
 
 def process(corpus=None, annotation=None, annotations=None, output=None, select=None,
-            algorithm=None, loginfo=None, skipinfo=None):
+            algorithm=None, loginfo=None, skipinfo=None, logger=None):
+    if logger['verbose']:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
     truth = parse_annotation_file(**kw(annotation))
     truth = parse_annotation_files(*annotations or list(), data=truth)
     algos = get_algorithms(**kw(algorithm))
@@ -48,6 +52,7 @@ def process(corpus=None, annotation=None, annotations=None, output=None, select=
                 max_res = None
                 for res in alg_func(doc, truth[doc.name]):
                     if res:
+                        logging.debug(f'{i}: {doc.name}: {res}')
                         out.writeline([doc.name, name, res.result, res.value, res.date, res.extras])
                     elif res.is_skip():  # always skip
                         skipper.add(doc.name)
@@ -66,7 +71,6 @@ def process(corpus=None, annotation=None, annotations=None, output=None, select=
 
 def main(config_file):
     conf = validate_config(config_file)
-    logging.basicConfig(level=logging.DEBUG)
     process(**conf)
 
 
