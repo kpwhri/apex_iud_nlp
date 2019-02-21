@@ -2,20 +2,22 @@ from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 # don't include "not" "insertion not completed since..."
-negation = r'(\bor\b|without|\bno\b|w/?o|v25|pamphlet|brochure|possib)'
+negation = r'(\bor\b|with\W*out|\bno\b|w/?o|v25|pamphlet|brochure|possib)'
 past = r'(past|has had)'
 
 INSERTION = Pattern(r'insert(ed|ion)', negates=[past])
 PROVIDER = Pattern(r'(difficult|\bcomplicat\w*|(with|more) traction|'
-                   r'excessive instrument|challeng|not complete|incomplete|'
+                   r'excessive (instrument|force)|challeng|'
                    r'cervi\w+ (stenosi|tight)|(stenosi|tight)\w+ cervi|'
-                   r'severe flexion)',
+                   r')',
                    negates=[negation])
+
+# us "used", us "confirmed proper/correct placement" properly
 US_GUIDE = Pattern(r'(u/?s|ultrasound) guid(ed?|ance)',
                    negates=[negation])
 CERV_DIL = Pattern(r'(cervical (dilat|ripen)\w+|(dilat|ripen)\w*( of)?( the?) cervix)',
                    negates=[negation])
-PARACERV = Pattern(r'(lidocaine|xylocaine|lignocaine|paracervical block|anesthe)',
+PARACERV = Pattern(r'(lidocaine|xylocaine|lignocaine|paracervical block)',
                    negates=[negation])
 MISPROSTOL = Pattern(r'(cytotec|misoprostol)',
                      negates=[negation])
