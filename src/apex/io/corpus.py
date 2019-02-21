@@ -6,18 +6,30 @@ from cronkd.conn.db import sqlai
 from apex.algo.pattern import Document
 
 
-def get_next_from_directory(directory, directories, version, encoding='utf8'):
+def get_next_from_directory(directory, directories, version, filenames=None,
+                            encoding='utf8'):
     if directory or directories:
         directories = directories or []
         if directory:
             directories.insert(0, directory)
         for directory in directories:
             corpus_dir = os.path.join(directory, version)
-            for entry in os.scandir(corpus_dir):
-                doc_name = entry.name.split('.')[0]
-                with open(entry.path, encoding=encoding) as fh:
-                    text = fh.read()
-                yield doc_name, None, text
+            if filenames:  # only look for specified files
+                for file in filenames:
+                    fp = os.path.join(corpus_dir, file)
+                    try:
+                        with open(fp, encoding=encoding) as fh:
+                            text = fh.read()
+                    except FileNotFoundError:
+                        continue
+                    else:
+                        yield file.split('.')[0], None, text
+            else:
+                for entry in os.scandir(corpus_dir):
+                    doc_name = entry.name.split('.')[0]
+                    with open(entry.path, encoding=encoding) as fh:
+                        text = fh.read()
+                    yield doc_name, None, text
 
 
 def get_next_from_connections(*connections):
@@ -43,9 +55,12 @@ def get_next_from_sql(name=None, driver=None, server=None,
 
 
 def get_next_from_corpus(directory=None, directories=None, version=None,
-                         connections=None, skipper=None, start=0, end=None):
+                         connections=None, skipper=None, start=0, end=None,
+                         filenames=None, encoding='utf8'):
     """
 
+    :param filenames:
+    :param encoding:
     :param connections:
     :param directories: list of directories to look through
     :param skipper:
@@ -57,7 +72,7 @@ def get_next_from_corpus(directory=None, directories=None, version=None,
     """
     i = -1
     for doc_name, path, text in itertools.chain(
-        get_next_from_directory(directory, directories, version),
+        get_next_from_directory(directory, directories, version, filenames, encoding),
         get_next_from_connections(*connections or list())
     ):
         if skipper and doc_name in skipper:
