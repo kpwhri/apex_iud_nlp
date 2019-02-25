@@ -1,4 +1,4 @@
-from apex.algo.breastfeeding import determine_breastfeeding
+from apex.algo.breastfeeding import confirm_breastfeeding
 from apex.algo.iud_brand import get_iud_brand
 from apex.algo.iud_difficult_insertion import confirm_difficult_insertion
 from apex.algo.iud_expulsion import confirm_iud_expulsion
@@ -15,5 +15,5 @@ ALGORITHMS = {
     'iud_removal': confirm_iud_removal,
     'iud_expulsion': confirm_iud_expulsion,
     'parity': get_parity,
-    'breastfeeding': determine_breastfeeding,
+    'breastfeeding': confirm_breastfeeding,
 }

@@ -1,3 +1,4 @@
+import re
 from functools import partial
 
 from apex.algo.pattern import Document, Pattern
@@ -7,19 +8,34 @@ from apex.algo.shared import hypothetical, negation, historical, boilerplate
 pain = r'(sore|pain\w*|infection|excoriat\w+|infection|yeast|candida|engorg\w+)'
 breast = r'(breast|nipple)'
 words_3 = r'( \w+){0,3} '
-ANY_BREAST = Pattern(r'(breast|nipple|milk|lactat\w+|\bbf\b)')
+ANY_BREAST = Pattern(r'(breast|nipple|milk|lactat\w+|\bbf\b|latch)')
 BREAST_PAIN = Pattern(f'({pain}{words_3}{breast}|{breast}{words_3}{pain})',
                       negates=[negation, hypothetical, historical, boilerplate])
+LATCHING = Pattern('(difficulty latching|latch(ing)? difficulty)')
 NIPPLE_SHIELD = Pattern(r'((us(es|ing)|wean\w+ from|yes|with)( the)? nipple shield|'
                         r'nipple shield in use)',
                         negates=[negation, hypothetical, historical, boilerplate])
-BREAST_MILK = Pattern(f'(breast milk|lactating|milk supply|supply{words_3}milk)')
+MILK_TRANSFER = Pattern('(milk transfer)')
+BREAST_MILK = Pattern(f'(breast milk|lactating|milk supply|supply{words_3}milk)',
+                      negates=['healthiest', 'wonders'])
 EXPRESSED_MILK = Pattern(r'(express\w+( breast)? milk)',
                          negates=[negation, hypothetical, historical, boilerplate])
 EXPRESSED_MILK_EXACT = Pattern(r'(expressed breast milk: (y|all))')
-LACTATION_VISIT = Pattern(r'(lactation) (visit|service|consult|specialist|assessment)')
+LACTATION_VISIT = Pattern(r'(lactation) (visit|service|consult|specialist|assessment)',
+                          negates=['\bif\b', 'please'])
 BF_DURATION = Pattern(r'(duration at breast|time breast feeding|total intake this feeding)')
 BF_TYPE = Pattern(r'(feeding methods? breast|type feeding breast)')
+BF_UNKNOWN = Pattern(r'(breast feeding (\*|na|yes/no/na|not applicable)'
+                     r')')
+BF_BOILERPLATE_EXCLUDE = Pattern(r'('
+                                 r'initial ob provider visit'
+                                 r'|prenatal (visit|care)'
+                                 r'|your care instructions'
+                                 r'|calcium requirements'
+                                 r'|establish a milk supply'
+                                 r'|baby feeding cues'
+                                 r'|sig'
+                                 r')')
 BF_BOILERPLATE = Pattern(r'(breastfeeding plan|most breastfeeding problems|use different positions|'
                          r'express some breastmilk|have the lactation nurse check out|breastfeeding questions|'
                          r'breastfeeding 101|how to breast feed|first few weeks of breast feeding|'
@@ -36,12 +52,34 @@ BF_BOILERPLATE = Pattern(r'(breastfeeding plan|most breastfeeding problems|use d
                          r'breastmilk on the nipples|'
                          r'breastmilk is the healthiest food for your baby|'
                          r'we are happy to connect you with local resources|'
-                         r'are considering stopping breastfeeding because)')
+                         r'are considering stopping breastfeeding because|'
+                         r'congratulations|'
+                         r'buspirone|'
+                         r'patient education|'
+                         r'circumcision|'
+                         r'when to call a doctor|'
+                         r'baby feeding cues|'
+                         r'newborn condition center|'
+                         r'come to the hospital if'
+                         r')')
+BF_BOILERPLATE_SECTION = Pattern(r'('
+                                 r'Bottle-Feeding: Promoting Healthy Growth and Development'
+                                 r'|practice deep latching techniques'
+                                 r'|after your visit'
+                                 r'|what to expect'
+                                 r'|information for parents and caregivers'
+                                 r').*', flags=re.IGNORECASE | re.MULTILINE)
 BF_HISTORY = Pattern(r'(breastfeeding history: y)')
-BF_EXACT = Pattern(r'(breast feeding: y|breastfeeding: offered: y|taking breast: (y|(for )\d))')
+BF_EXACT = Pattern(r'(breast feeding(:|\?) y|breastfeeding: offered: y|'
+                   r'taking breast: (y|(for )\d)|breastfeeding evaluation|'
+                   r'breastfeeding observation|'
+                   r'breast\s(feeding|milk) every \d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)? [hm]'
+                   r')')
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
                       negates=['previous', 'history', 'hx'])
-BF_YES = Pattern(r'(breast feeding well|(is|been) breast feeding)',
+BF_YES = Pattern(r'(breast feeding well|(is|been) breast feeding'
+                 r'|breast feeding without difficulty|still breast feeding'
+                 r'|continues to breast feed)',
                  negates=[negation, hypothetical])
 BF = Pattern(r'(feed\w+ breast|breast feeding|breast fed|\bbf\b)',
              negates=[negation, hypothetical, historical, boilerplate])
@@ -76,12 +114,23 @@ class BreastfeedingStatus(Status):
     SKIP = 99
 
 
+def confirm_breastfeeding(document: Document, expected=None):
+    for res in determine_breastfeeding(document, expected=expected):
+        if res.result in [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13]:
+            yield res
+
+
 def determine_breastfeeding(document: Document, expected=None):
     my_result = partial(Result, expected=expected)
     has_boilerplate = False
+    document = document.remove_patterns(BF_BOILERPLATE_SECTION)
+    if document.has_patterns(BF_BOILERPLATE_EXCLUDE, BF_UNKNOWN):
+        return
     if document.has_patterns(BF_BOILERPLATE):
         yield my_result(BreastfeedingStatus.BOILERPLATE)
         has_boilerplate = True
+    non_exact_count = 0
+    non_exact_count_snippets = []
     for section in document.select_sentences_with_patterns(ANY_BREAST):
         found_bf = False
         # pre boilerplate patterns: exact/not confused with boilerplate
@@ -103,16 +152,23 @@ def determine_breastfeeding(document: Document, expected=None):
             yield my_result(BreastfeedingStatus.PUMPING, text=section.text)
         if section.has_patterns(BOTTLE_EXACT):
             yield my_result(BreastfeedingStatus.BOTTLE, text=section.text)
+        if section.has_patterns(BF_STOP):
+            yield my_result(BreastfeedingStatus.STOP, text=section.text)
+        if section.has_patterns(LATCHING):
+            yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
+            found_bf = True
         # boilerplate: there is at least some template language
-        if has_boilerplate:
-            pass
-        elif not found_bf:
+        if not found_bf and not has_boilerplate:
             # only non-boilerplate
             if section.has_patterns(NIPPLE_SHIELD, BF_SUPPLEMENT):
                 yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
-            if section.has_patterns(BREAST_MILK, BF, PUMPING, EXPRESSED_MILK):
-                yield my_result(BreastfeedingStatus.MAYBE, text=section.text)
+            cnt = section.has_patterns(BREAST_MILK, BF, PUMPING, EXPRESSED_MILK, MILK_TRANSFER, get_count=True)
+            if cnt:
+                non_exact_count += cnt
+                non_exact_count_snippets.append(section.text)
             if section.has_patterns(LACTATION_VISIT):
                 yield my_result(BreastfeedingStatus.LACTATION_VISIT, text=section.text)
             if section.has_patterns(BREAST_PAIN):
                 yield my_result(BreastfeedingStatus.BREAST_PAIN, text=section.text)
+        if len(non_exact_count) >= 2:
+            yield my_result(BreastfeedingStatus.MAYBE, text='\n'.join(non_exact_count_snippets))
