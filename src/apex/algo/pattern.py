@@ -171,12 +171,29 @@ class Section:
             return m.group(index)
         return m
 
-    def has_patterns(self, *pats, has_all=False, ignore_negation=False):
+    def has_patterns(self, *pats, has_all=False, ignore_negation=False, get_count=False):
+        """
+
+        :param pats:
+        :param has_all:
+        :param ignore_negation:
+        :param get_count: number of patterns to match
+        :return:
+        """
+        if get_count:
+            has_all = False  # ensure this is properly set
+        cnt = 0
         for pat in pats:
-            if has_all and not self.has_pattern(pat, ignore_negation=ignore_negation):
+            match = self.has_pattern(pat, ignore_negation=ignore_negation)
+            if get_count:
+                if match:
+                    cnt += 1
+            elif has_all and not match:
                 return False
-            elif not has_all and self.has_pattern(pat, ignore_negation=ignore_negation):
+            elif not has_all and match:
                 return True
+        if get_count:
+            return cnt
         return has_all
 
     def __str__(self):
