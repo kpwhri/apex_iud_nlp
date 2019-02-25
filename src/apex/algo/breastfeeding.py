@@ -35,6 +35,8 @@ BF_BOILERPLATE_EXCLUDE = Pattern(r'('
                                  r'|establish a milk supply'
                                  r'|baby feeding cues'
                                  r'|sig'
+                                 r'|learning how to breast-feed'
+                                 r'|folic acid'
                                  r')')
 BF_BOILERPLATE = Pattern(r'(breastfeeding plan|most breastfeeding problems|use different positions|'
                          r'express some breastmilk|have the lactation nurse check out|breastfeeding questions|'
@@ -68,6 +70,7 @@ BF_BOILERPLATE_SECTION = Pattern(r'('
                                  r'|after your visit'
                                  r'|what to expect'
                                  r'|information for parents and caregivers'
+                                 r'|some suggestions'
                                  r').*', flags=re.IGNORECASE | re.MULTILINE)
 BF_HISTORY = Pattern(r'(breastfeeding history: y)')
 BF_EXACT = Pattern(r'(breast feeding(:|\?) y|breastfeeding: offered: y|'
@@ -78,7 +81,7 @@ BF_EXACT = Pattern(r'(breast feeding(:|\?) y|breastfeeding: offered: y|'
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
                       negates=['previous', 'history', 'hx'])
 BF_YES = Pattern(r'(breast feeding well|(is|been) breast feeding'
-                 r'|breast feeding without difficulty|still breast feeding'
+                 r'|breast feeding without difficulty|still (breast feeding|nurses)'
                  r'|continues to breast feed)',
                  negates=[negation, hypothetical])
 BF = Pattern(r'(feed\w+ breast|breast feeding|breast fed|\bbf\b)',
@@ -92,7 +95,8 @@ BOTTLE_EXACT = Pattern(r'(taking bottle: y|method: bottle)')
 BF_SUPPLEMENT = Pattern(r'supplement breast feeding',
                         negates=[negation, hypothetical, historical, boilerplate])
 BF_STOP = Pattern(r'(stop\w+|no longer|quit) (breast feeding|nursing)',
-                  negates=[negation, hypothetical, historical, boilerplate])
+                  negates=[negation, hypothetical, historical, boilerplate,
+                           'for a few days', 'had', 'on that side', 'cause', 'conflicted'])
 
 
 class BreastfeedingStatus(Status):
