@@ -174,5 +174,5 @@ def determine_breastfeeding(document: Document, expected=None):
                 yield my_result(BreastfeedingStatus.LACTATION_VISIT, text=section.text)
             if section.has_patterns(BREAST_PAIN):
                 yield my_result(BreastfeedingStatus.BREAST_PAIN, text=section.text)
-        if len(non_exact_count) >= 2:
-            yield my_result(BreastfeedingStatus.MAYBE, text='\n'.join(non_exact_count_snippets))
+    if non_exact_count >= 2:
+        yield my_result(BreastfeedingStatus.MAYBE, text='\n'.join(non_exact_count_snippets))
