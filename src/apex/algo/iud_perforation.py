@@ -18,7 +18,7 @@ COMPLETE = Pattern('('
                    f'{IUD} (visible|seen|visual\\w+)? in vagina'
                    r')',
                    negates=[boilerplate, historical, negation, impact_neg, possible,
-                            hypothetical, 'against'])
+                            hypothetical, 'against', 'free'])
 PERFORATION = Pattern(r'('
                       r'perforat(ion|ed|e)s?|(pierc\w+|thr(ough|u)|into|to)'
                       r'( the)?( uterine)? (wall|myometrium|serosa)'
@@ -33,11 +33,12 @@ EMBEDDED = Pattern(f'({embedded})',
 MIGRATED = Pattern(f'{migrated}',
                    negates=[boilerplate, historical, possible, negation, 'strings?', in_place])
 LAPAROSCOPIC_REMOVAL = Pattern(r'('
-                               r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\W+){0,10} (remov|retriev)\w+|'
-                               r'(remov|retriev)\w+(\w+\W+){0,10}lap[ao]r[ao]scop\w+'
+                               r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\s+){0,10} (remov|retriev)\w+|'
+                               r'(remov|retriev)\w+(\w+\s+){0,10}lap[ao]r[ao]scop\w+'
                                r')',
                                negates=[historical, boilerplate, 'hysterectomy', r'excis\w+',
-                                        'cysts?', 'tubal ligati\w+', r'steriliz\w+',
+                                        'cysts?', 'tubal ligati\w+', r'steriliz\w+', r'bilat\w+',
+                                        'diagnostic', 'tube', 'salping', 'btl', 'ovary',
                                         possible, hypothetical])
 
 # displace + iud visible at/in cervix = PARTIAL

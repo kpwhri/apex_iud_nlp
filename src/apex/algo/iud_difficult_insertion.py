@@ -55,7 +55,7 @@ class DiffInsStatus(Status):
 def confirm_difficult_insertion(document: Document, expected=None):
     for status, text in determine_difficult_insertion(document):
         logging.debug(f'{status}: {text}')
-        if status in [1, 2, 3, 4, 5, 6]:
+        if status.value in [1, 2, 3, 4, 5, 6]:
             yield Result(status, status.value, expected, text)
 
 

@@ -5,6 +5,7 @@ from apex.algo.result import Status, Result
 
 nose = r'(\bnose\b|%)'
 
+# IGNORE
 INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|bad|\bmal\b)',
                     negates=[nose, hypothetical, negation, boilerplate])
 PLACEMENT = Pattern(r'(plac\w+|position\w*|location)',
@@ -14,13 +15,16 @@ MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
 DISPLACEMENT = Pattern(r'(\brotat\w+|(lower|inferior) (uter(ine|us)|cervi(x|cal))|'
                        r'displac\w+|dislodg\w+)',
                        negates=[nose, hypothetical, negation, historical, boilerplate, in_place])
+#  // IGNORE
 EXPULSION = Pattern(r'(expel|expuls)',
                     negates=[nose, hypothetical, historical, negation, boilerplate])
 DEF_EXPULSION = Pattern(r'spontan\w+ (expel|expul)',
                         negates=[nose, hypothetical, historical, negation, boilerplate])
+# displace/malposition/incorrectly in the abdomen
+# IUD fell out, strings not visualized == expulsion
 PARTIAL_EXP = Pattern(r'(partial\w* (expel|expul)|(expel|expul)\w* partial)',
                       negates=[nose, negation, 'strings? of', boilerplate])
-VISUALIZED = Pattern(r'({IUD})( was)? (seen|visualiz)',
+VISUALIZED = Pattern(f'({IUD})( was)? (seen|visualiz)',
                      negates=[nose, negation, hypothetical, boilerplate])
 PROTRUDES = Pattern(r'protrud',
                     negates=['strings?', nose, hypothetical, boilerplate])
