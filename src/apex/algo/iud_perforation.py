@@ -36,9 +36,10 @@ LAPAROSCOPIC_REMOVAL = Pattern(r'('
                                r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\s+){0,10} (remov|retriev)\w+|'
                                r'(remov|retriev)\w+(\w+\s+){0,10}lap[ao]r[ao]scop\w+'
                                r')',
-                               negates=[historical, boilerplate, 'hysterectomy', r'excis\w+',
+                               negates=[historical, boilerplate, 'hysterectom\w+', r'excis\w+',
                                         'cysts?', 'tubal ligati\w+', r'steriliz\w+', r'bilat\w+',
-                                        'diagnostic', 'tube', 'salping', 'btl', 'ovary',
+                                        'diagnostic', 'tub\w+', 'salping', 'btl', 'ovar\w+',
+                                        r'\bbtl\b', r'\bbso\b', r'\bport\b', 'oophorect\w+',
                                         possible, hypothetical])
 
 # displace + iud visible at/in cervix = PARTIAL
