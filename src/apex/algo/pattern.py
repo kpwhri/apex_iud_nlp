@@ -18,7 +18,7 @@ class Match:
             if idx == 0:
                 res.append(self.match.group())
             else:
-                res.append(self._groups[idx-1])
+                res.append(self._groups[idx - 1])
 
     def groups(self):
         if not self._groups:
@@ -115,9 +115,9 @@ class MatchCask:
 
 class Sentence:
 
-    def __init__(self, text, mc: MatchCask):
+    def __init__(self, text, mc: MatchCask = None):
         self.text = text
-        self.matches = mc
+        self.matches = mc or MatchCask()
 
     def has_pattern(self, pat, ignore_negation=False):
         m = pat.matches(self.text, ignore_negation=ignore_negation)
@@ -143,7 +143,7 @@ class Sentence:
 
 class Section:
 
-    def __init__(self, sentences, mc: MatchCask, add_matches=False):
+    def __init__(self, sentences, mc: MatchCask = None, add_matches=False):
         """
 
         :param sentences:
@@ -153,7 +153,7 @@ class Section:
         """
         self.sentences = sentences
         self.text = '\n'.join(sent.text for sent in sentences)
-        self.matches = mc
+        self.matches = mc or MatchCask()
         if add_matches:
             for sent in self.sentences:
                 self.matches.add_all(sent.matches.matches)
@@ -196,6 +196,12 @@ class Section:
             return cnt
         return has_all
 
+    def __bool__(self):
+        return len(self.sentences) > 0 and bool(self.text.strip())
+
+    def __add__(self, other):
+        return Section(self.sentences + other.sentences, self.matches.copy().add_all(other.matches.matches))
+
     def __str__(self):
         return self.text
 
@@ -204,7 +210,6 @@ class Section:
 
 
 class Document:
-
     HISTORY_REMOVAL = re.compile(r'HISTORY:.*?(?=[A-Z]+:)')
 
     def __init__(self, name, file=None, text=None, encoding='utf8'):
@@ -313,3 +318,38 @@ class Document:
             return Section(self.sentences[sents[0]:sents[-1] + 1], self.matches)
         else:
             return Section([self.sentences[i] for i in sents], self.matches)
+
+    def split(self, rx, group=1):
+        prev_start = 0
+        prev_name = None
+        sections = Sections()
+        for m in re.finditer(rx, self.text):
+            if prev_name:
+                sections.add(prev_name, self.text[prev_start: m.start()])
+            prev_name = m.group(group)
+            prev_start = m.end()
+        if prev_name:
+            sections.add(prev_name, self.text[prev_start:])
+        return sections
+
+
+class Sections:
+
+    def __init__(self):
+        self.sections = {}
+
+    def add(self, name, text):
+        self.sections[name.upper()] = Section([Sentence(x) for x in text.split('\n') if x.strip()])
+
+    def get_sections(self, *names) -> Section:
+        sect = Section([])
+        for name in names:
+            name = name.upper()
+            if name in self.sections:
+                sect += self.get_section(name)
+        return sect
+
+    def get_section(self, name):
+        if name.upper() in self.sections:
+            return self.sections[name.upper()]
+        return Section([])
