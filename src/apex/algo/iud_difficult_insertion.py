@@ -24,16 +24,20 @@ PROVIDER = Pattern(r'(difficult|\bcomplicat\w*|(with|more) traction|'
 NOT_IUD_INSERTION = Pattern(r'(implanon (was )?(placed|inserted)|'
                             f'{IUD} removal'
                             r')')
+# TODO: aborted, failed, insert
 UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful|'
                                  f'{IUD} (can)?n[o\']t( be)? place|'
                                  f'((can)?n[o\']t|unable)( to)? place {IUD}'
                                  r')')
 
-# us "used", us "confirmed proper/correct placement" properly
+# TODO: us "used", us "confirmed proper/correct placement" properly
+# TODO: us verified/confirmed; order an ultrasound; radiology confirms placement
 US_GUIDE = Pattern(r'(u/?s|ultrasound) guid(ed?|ance)',
                    negates=[negation])
+# uterine/uterus
 CERV_DIL = Pattern(r'(cervical (dilat|ripen)\w+|(dilat|ripen)\w*( of)?( the?) cervix)',
                    negates=[negation])
+# TODO: lido; *caine
 PARACERV = Pattern(r'(lidocaine|xylocaine|lignocaine|paracervical block)',
                    negates=[negation])
 MISPROSTOL = Pattern(r'(cytotec|misoprostol)',
