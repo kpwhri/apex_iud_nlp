@@ -24,21 +24,23 @@ PROVIDER = Pattern(r'(difficult|\bcomplicat\w*|(with|more) traction|'
 NOT_IUD_INSERTION = Pattern(r'(implanon (was )?(placed|inserted)|'
                             f'{IUD} removal'
                             r')')
-# TODO: aborted, failed, insert
-UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful|'
-                                 f'{IUD} (can)?n[o\']t( be)? place|'
-                                 f'((can)?n[o\']t|unable)( to)? place {IUD}'
+UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful'
+                                 f'|{IUD} (can)?n[o\']t( be)? place'
+                                 f'|((can)?n[o\']t|unable)( to)? place {IUD}'
+                                 r'|aborted|failed'
                                  r')')
 
-# TODO: us "used", us "confirmed proper/correct placement" properly
-# TODO: us verified/confirmed; order an ultrasound; radiology confirms placement
-US_GUIDE = Pattern(r'(u/?s|ultrasound) guid(ed?|ance)',
-                   negates=[negation])
+US = Pattern(r'(u/?s|ultrasound|radiology)',
+             negates=[negation])
+US_USED = Pattern(r'('
+                  r'guid(ed?|ance)|\bused?\b|(verif|determine|confirm)\w* (proper|correct)?'
+                  f' ({IUD} )?(place|location)'
+                  r')',
+                  negates=[negation])
 # uterine/uterus
 CERV_DIL = Pattern(r'(cervical (dilat|ripen)\w+|(dilat|ripen)\w*( of)?( the?) cervix)',
                    negates=[negation])
-# TODO: lido; *caine
-PARACERV = Pattern(r'(lidocaine|xylocaine|lignocaine|paracervical block)',
+PARACERV = Pattern(r'(\blido\b|\w+caine\b|paracervical block)',
                    negates=[negation])
 MISPROSTOL = Pattern(r'(cytotec|misoprostol)',
                      negates=[negation])
@@ -82,7 +84,7 @@ def determine_difficult_insertion(document: Document):
                 if section.has_patterns(PROVIDER):
                     yield DiffInsStatus.PROVIDER_STATEMENT, section.text
                     found = True
-                if section.has_patterns(US_GUIDE):
+                if section.has_patterns(US, US_USED, has_all=True):
                     yield DiffInsStatus.ULTRASOUND_GUIDANCE, section.text
                     found = True
                 if section.has_patterns(PARACERV):
