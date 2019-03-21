@@ -36,7 +36,7 @@ def determine_iud_expulsion_rad(document: Document):
     sections = document.split(SECTIONS)
     start_section = sections.get_sections('HST', 'SAS', 'HISTORY',
                                           'CLINICAL INFORMATION', 'CLINICAL HISTORY AND QUESTION')
-    impression = sections.get_section('IMPRESSION', 'IMPRESSIONS')
+    impression = sections.get_sections('IMPRESSION', 'IMPRESSIONS')
     other = sections.get_sections('FINDINGS', 'TRANSVAGINAL', 'FINDING')
     found = False
     if impression:
