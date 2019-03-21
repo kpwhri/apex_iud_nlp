@@ -5,21 +5,25 @@ from apex.algo.result import Status, Result
 
 nose = r'(\bnose\b|%)'
 
-INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|bad|\bmal\b)',
-                    negates=[nose, hypothetical, negation, boilerplate])
+INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|badly|\bmal\b)',
+                    negates=[nose, hypothetical, negation, boilerplate, r'diff\w+', 'carcinoma'])
 PLACEMENT = Pattern(r'(plac\w+|position\w*|location)',
                     negates=[nose, hypothetical, negation, boilerplate])
 MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
                       negates=[nose, hypothetical, negation, boilerplate, in_place])
-DISPLACEMENT = Pattern(r'(\brotat\w+|(lower|inferior) uter(ine|us)|'
-                       r'displac\w+|dislodg\w+)',
+DISPLACEMENT = Pattern(r'(\brotate\w+'
+                       r'|(lower|inferior) uter(ine|us)'
+                       r'|(displace|dislodge)(d|ment))',
                        negates=[nose, hypothetical, negation, historical, boilerplate, in_place])
 IN_CERVIX = Pattern(r'(within|inside|in) (the )?(cx|cervical|cervix)',
                     negates=[negation])
 PARTIAL_EXP = Pattern(r'(partial\w* (expel|expul)'
                       r'|(expel|expul)\w* partial'
-                      r'|(visible|found|visualiz|note|locate|position|present|identif)\w* (within|inside|in)'
-                      r' (the )?(lower uter(ine segment|us) (and )?(the )?)? (\w+\s+){,4}(cx|cervical|cervix|os)'
+                      r'|(visible|found|visualiz|note|locate|position|present|identif)\w* (it )?(within|inside|in)'
+                      r' (\w+\s+){,4}'
+                      r' (the )?'
+                      r'(lower uter(ine segment|us) (and )?(the )?)?'
+                      r' (\w+\s+){,4}(cx|cervical|cervix|os)'
                       r'|protrud\w+ from (the )?(cx|cervical|cervix|os)'
                       r')',
                       negates=[nose, negation, 'string', 'polyp', boilerplate])
@@ -27,7 +31,7 @@ VISUALIZED = Pattern(f'(({IUD})( was)? (seen|visualiz|visible|noted|in place|pos
                      f'|present|identif))',
                      negates=[nose, negation, hypothetical, boilerplate])
 MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|find))',
-                  negates=[nose, hypothetical, boilerplate, 'resume'])
+                  negates=[nose, hypothetical, boilerplate, 'resume', r'\btip\b'])
 
 COMPLETE = Pattern(r'(fell out'
                    r'|(spontaneous|complete)\w* exp[ue]l\w+'
