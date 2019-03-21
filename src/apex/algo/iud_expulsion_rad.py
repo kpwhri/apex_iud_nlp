@@ -20,7 +20,7 @@ MALPOSITION = Pattern(r'('
                       f'|{IUD} (note|found|seen|visualiz|locate|position)\\w*'
                       r'\s+(\w+\s+){,4}in'
                       r' (the )?(inferior body|lower uterine)'
-                      r'|(inferior|distal) to (the )?(expect|desire)'
+                      r'|(inferior|distal) to (the )?(expect|desir|typical)'
                       r')',
                       negates=[nose, negation, 'string', 'polyp', boilerplate])
 MALPOSITION_IUD = Pattern(f'((mal position) {IUD}|{IUD} (is )?mal position)',
