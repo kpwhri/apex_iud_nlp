@@ -34,15 +34,12 @@ def confirm_iud_expulsion_rad(document: Document, expected=None):
 
 def determine_iud_expulsion_rad(document: Document):
     sections = document.split(SECTIONS)
-    start_section = sections.get_sections('HST', 'SAS', 'HISTORY', 'CLINICAL INFORMATION')
-    impression = sections.get_section('IMPRESSION')
-    other = sections.get_sections('FINDINGS', 'TRANSVAGINAL')
-    if not start_section:
-        print(1)
-        pass
+    start_section = sections.get_sections('HST', 'SAS', 'HISTORY',
+                                          'CLINICAL INFORMATION', 'CLINICAL HISTORY AND QUESTION')
+    impression = sections.get_section('IMPRESSION', 'IMPRESSIONS')
+    other = sections.get_sections('FINDINGS', 'TRANSVAGINAL', 'FINDING')
     found = False
-    if start_section.has_patterns(IUD, IUD_PRESENT, has_all=True) or \
-            start_section.has_patterns(STRING, VISIBLE, has_all=True):
+    if impression:
         if impression.has_patterns(PARTIAL_EXP):
             found = True
             yield ExpulsionStatus.PARTIAL, impression.text
@@ -52,19 +49,20 @@ def determine_iud_expulsion_rad(document: Document):
         if impression.has_patterns(MALPOSITION, MALPOSITION_IUD):
             found = True
             yield ExpulsionStatus.MALPOSITION, impression.text
-        if not found:
-            if other.has_patterns(PARTIAL_EXP):
-                yield ExpulsionStatus.PARTIAL, impression.text
-            if other.has_patterns(MALPOSITION, MALPOSITION_IUD):
-                yield ExpulsionStatus.MALPOSITION, impression.text
+    if found:
+        return
+    elif start_section.has_patterns(IUD, IUD_PRESENT, has_all=True) or \
+            start_section.has_patterns(STRING, VISIBLE, has_all=True):
+        if other.has_patterns(PARTIAL_EXP):
+            yield ExpulsionStatus.PARTIAL, impression.text
+        if other.has_patterns(MALPOSITION, MALPOSITION_IUD):
+            yield ExpulsionStatus.MALPOSITION, impression.text
     else:
         sentences = list(document.select_sentences_with_patterns(IUD))
         if sentences:
             for sentence in sentences:
                 if sentence.has_patterns(PARTIAL_EXP):
                     yield ExpulsionStatus.PARTIAL, sentence.text
-                if sentence.has_patterns(NOT_SEEN_IUD, IUD_NOT_SEEN):
-                    yield ExpulsionStatus.LOST, sentence.text
                 if sentence.has_patterns(MALPOSITION, MALPOSITION_IUD):
                     yield ExpulsionStatus.MALPOSITION, sentence.text
         else:
