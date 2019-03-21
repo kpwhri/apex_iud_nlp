@@ -10,7 +10,9 @@ IUD_PRESENT = Pattern(r'(present|place|evaluate|position|absent|locat)')
 STRINGS = Pattern(r'string')
 VISIBLE = Pattern(r'(unable|visible|see|absent|\bnot?\b|inability|palpable)')
 
-MISSING_IUD = Pattern(f'(({IUD})( was)?not (seen|visualiz|noted|in place|position|present))')
+IUD_NOT_SEEN = Pattern(f'(({IUD})( was)? n[o\W]t (seen|visualiz|noted|in place|position|present|identified))')
+NOT_SEEN_IUD = Pattern(f'no {IUD} (seen|visualiz|noted|in place|position|present|identified)')
+MISSING_IUD = Pattern(f'({IUD} (absent|missing)|(absent|missing) {IUD})')
 MALPOSITION = Pattern(r'('
                       r'(visible|found|locate|position)\w* (within|inside|in)'
                       r' (the )?(lower uterine|inferior body)'
@@ -36,7 +38,7 @@ def determine_iud_expulsion_rad(document: Document):
         if impression.has_patterns(PARTIAL_EXP):
             found = True
             yield ExpulsionStatus.PARTIAL, impression.text
-        if impression.has_patterns(MISSING_IUD):
+        if impression.has_patterns(NOT_SEEN_IUD, IUD_NOT_SEEN):
             found = True
             yield ExpulsionStatus.LOST, impression.text
         if impression.has_patterns(MALPOSITION):

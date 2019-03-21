@@ -18,18 +18,19 @@ IN_CERVIX = Pattern(r'(within|inside|in) (the )?(cx|cervical|cervix)',
                     negates=[negation])
 PARTIAL_EXP = Pattern(r'(partial\w* (expel|expul)'
                       r'|(expel|expul)\w* partial'
-                      r'|(visible|found|locate|position)\w* (within|inside|in)'
+                      r'|(visible|found|visualiz|note|locate|position|present|identif)\w* (within|inside|in)'
                       r' (the )?(lower uter(ine segment|us) and (the )?)?(cx|cervical|cervix|os)'
                       r'|protrud\w+ from (the )?(cx|cervical|cervix|os)'
                       r')',
                       negates=[nose, negation, 'string', 'polyp', boilerplate])
-VISUALIZED = Pattern(f'(({IUD})( was)? (seen|visualiz|noted|in place|position|present))',
+VISUALIZED = Pattern(f'(({IUD})( was)? (seen|visualiz|visible|noted|in place|position'
+                     f'|present|identif))',
                      negates=[nose, negation, hypothetical, boilerplate])
 MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|find))',
                   negates=[nose, hypothetical, boilerplate, 'resume'])
 
 COMPLETE = Pattern(r'(fell out|(spontaneous|complete)\w* exp[ue]l\w+'
-                   r'|iud (note|found|seen|visualiz|locate|position)\w*\s+(\w+\s+){,4}in vagina'
+                   r'|iud (note|found|seen|visualiz|locate|position|present|identif)\w*\s+(\w+\s+){,4}in vagina'
                    r')',
                    negates=['in case', 'applicator', 'inserter', 'insertion', 'in the past', 'history',
                             hypothetical, boilerplate, nose, in_place, negation, 'string', 'polyp'])
