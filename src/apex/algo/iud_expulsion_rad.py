@@ -1,25 +1,24 @@
 import re
 
-from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, nose
+from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, nose, LOWER_UTERINE, NOTED, INSIDE
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result
 from apex.algo.shared import IUD, negation, boilerplate
 
 SECTIONS = re.compile(r'([A-Z]+( [A-Z]+)?|Impression|Transvaginal|Transabdominal'
                       r'|Findings|Examination|History)\W*?:')
-IUD_PRESENT = Pattern(r'(present|place|evaluate|position|absent|locat|exp[eu]l|see)')
+IUD_PRESENT = Pattern(f'({NOTED}|absent)')
 STRING = Pattern(r'string')
 VISIBLE = Pattern(r'(unable|missing|visible|see|absent|\bnot?\b|inability|palpable)')
 
-IUD_NOT_SEEN = Pattern(f'(({IUD})( was)? n[o\\W]t (seen|visualiz|noted|in place|position|present|identified))')
-NOT_SEEN_IUD = Pattern(f'no {IUD} (seen|visualiz|noted|in place|position|present|identified)')
+IUD_NOT_SEEN = Pattern(f'(({IUD})( was)? n[o\\W]t {NOTED})')
+NOT_SEEN_IUD = Pattern(f'no {IUD} {NOTED}')
 MISSING_IUD = Pattern(f'({IUD} (absent|missing)|(absent|missing) {IUD})')
 MALPOSITION = Pattern(r'('
-                      r'(visible|found|locate|position)\w* (within|inside|in)'
-                      r' (the )?(lower uterine|inferior body)'
-                      f'|{IUD} (note|found|seen|visualiz|locate|position)\\w*'
+                      f'{NOTED} {INSIDE} (the )?{LOWER_UTERINE}'
+                      f'|{IUD} {NOTED}'
                       r'\s+(\w+\s+){,4}in'
-                      r' (the )?(inferior body|lower uterine)'
+                      f' (the )?{LOWER_UTERINE}'
                       r'|(inferior|distal) to (the )?(expect|desir|typical)'
                       r')',
                       negates=[nose, negation, 'string', 'polyp', boilerplate])

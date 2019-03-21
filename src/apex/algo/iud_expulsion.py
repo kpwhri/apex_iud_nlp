@@ -1,9 +1,16 @@
-from apex.algo.shared import IUD, POSSIBLE, boilerplate, hypothetical, historical, negation, in_place
+from apex.algo.shared import IUD, boilerplate, hypothetical, historical, negation, in_place
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 
 nose = r'(\bnose\b|%)'
+
+UTERINE = r'(uter(ine|us))'
+LOWER_UTERINE = f'((lower|inferior) (({UTERINE}|segment|body) )+)'
+NOTED = r'((see|visible|found|in place|visualiz|note|locate|position|present|identif)\w*)'
+INSIDE = r'(within|inside|in)'
+CX = r'(\bcx\b|cervical|cervix)'
+CX_OS = f'({CX}|os)'
 
 INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|badly|\bmal\b)',
                     negates=[nose, hypothetical, negation, boilerplate, r'diff\w+', 'carcinoma'])
@@ -12,37 +19,37 @@ PLACEMENT = Pattern(r'(plac\w+|position\w*|location)',
 MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
                       negates=[nose, hypothetical, negation, boilerplate, in_place])
 DISPLACEMENT = Pattern(r'(\brotate\w+'
-                       r'|(lower|inferior) uter(ine|us)'
+                       f'|{LOWER_UTERINE}'
                        r'|(displace|dislodge)(d|ment))',
                        negates=[nose, hypothetical, negation, historical, boilerplate, in_place])
-IN_CERVIX = Pattern(r'(within|inside|in) (the )?(cx|cervical|cervix)',
+IN_CERVIX = Pattern(f'{INSIDE} (the )?{CX}',
                     negates=[negation])
-PARTIAL_EXP = Pattern(r'(partial\w* (expel|expul)'
-                      r'|(expel|expul)\w* partial'
-                      r'|(visible|found|visualiz|note|locate|position|present|identif)\w* (it )?(within|inside|in)'
+PARTIAL_EXP = Pattern(r'(partial\w* exp[eu]l'
+                      r'|exp[ue]l\w* partial'
+                      f'|{NOTED} (it )?{INSIDE}'
                       r' (\w+\s+){,4}'
                       r' (the )?'
-                      r'(lower uter(ine segment|us) (and )?(the )?)?'
-                      r' (\w+\s+){,4}(cx|cervical|cervix|os)'
-                      r'|protrud\w+ from (the )?(cx|cervical|cervix|os)'
+                      f'({LOWER_UTERINE}( and)?'
+                      r' (the )?(\w+\s+){,4})?'
+                      f' {CX_OS}'
+                      f'|protrud\\w+ from (the )?{CX_OS}'
                       r')',
                       negates=[nose, negation, 'string', 'polyp', boilerplate])
-VISUALIZED = Pattern(f'(({IUD})( was)? (seen|visualiz|visible|noted|in place|position'
-                     f'|present|identif))',
+VISUALIZED = Pattern(f'(({IUD})( was)? {NOTED})',
                      negates=[nose, negation, hypothetical, boilerplate])
-MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|find))',
+MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|find|locat))',
                   negates=[nose, hypothetical, boilerplate, 'resume', r'\btip\b'])
 
 COMPLETE = Pattern(r'(fell out'
                    r'|(spontaneous|complete)\w* exp[ue]l\w+'
                    r'|exp[ue]l\w+ (spontaneous|complete)'
-                   r'|iud (note|found|seen|visualiz|locate|position|present|identif)\w*\s+(\w+\s+){,4}in vagina'
+                   f'|{IUD} {NOTED}'
+                   r'\w*\s+(\w+\s+){,4}in vagina'
                    r')',
                    negates=['in case', 'applicator', 'inserter', 'insertion', 'in the past', 'history', r'\bh\W*o\b',
                             hypothetical, boilerplate, nose, in_place, negation, 'string', 'polyp'])
 
-STRINGS = Pattern(r'strings?', negates=['bothersome', 'noted', 'in place', 'seen',
-                                        'visualized', 'cut', 'check', 'trim'])
+STRINGS = Pattern(r'strings?', negates=['bothersome', NOTED, 'cut', 'check', 'trim'])
 
 
 class ExpulsionStatus(Status):

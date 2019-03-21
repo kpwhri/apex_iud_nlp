@@ -18,7 +18,7 @@ from apex.algo.shared import IUD
     'identified it in the anterior portion in the lower uterus and cervical canal',
 ])
 def test_partial_regex_match(text):
-    assert PARTIAL_EXP.matches(text)
+    assert PARTIAL_EXP.matches(text), PARTIAL_EXP.pattern.pattern
 
 
 @pytest.mark.parametrize('text', [
