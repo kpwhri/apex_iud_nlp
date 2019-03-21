@@ -1,6 +1,6 @@
 import pytest
 
-from apex.algo.iud_expulsion import PARTIAL_EXP
+from apex.algo.iud_expulsion import PARTIAL_EXP, MISSING, STRINGS
 from apex.algo.iud_expulsion_rad import MALPOSITION, NOT_SEEN_IUD, IUD_NOT_SEEN, IUD_PRESENT, STRING, VISIBLE
 from apex.algo.shared import IUD
 
@@ -12,6 +12,9 @@ from apex.algo.shared import IUD
     'IUD is very low and located in the cervix',
     'located in the cervical canal',
     'tip now located in the cervical region',
+    'partial expulsion',
+    'IUD protruding from os',
+    'IUD was located in the lower uterine segment/upper part of the cervix',
 ])
 def test_partial_regex_match(text):
     assert PARTIAL_EXP.matches(text)
@@ -42,7 +45,7 @@ def test_iudnotseen_regex_match(text):
 
 @pytest.mark.parametrize('text', [
     'Confirm no IUD seen in abdomen / pelvis',
-    'Mirena not seen'
+    'Mirena not seen',
 ])
 def test_iudpresent_regex_match(text):
     """Confirm proper hst/sas"""
@@ -52,6 +55,14 @@ def test_iudpresent_regex_match(text):
 @pytest.mark.parametrize('text', [
     'strings missing',
 ])
-def test_stringsmissing_regex_match(text):
+def test_stringsearch_regex_match(text):
     """Confirm proper hst/sas"""
     assert STRING.matches(text) and VISIBLE.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'Unable to find IUD string',
+])
+def test_stringsmissing_regex_match(text):
+    """Confirm proper hst/sas"""
+    assert MISSING.matches(text) and STRINGS.matches(text)
