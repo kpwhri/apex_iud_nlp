@@ -26,6 +26,9 @@ class Match:
         else:
             return tuple(self._groups)
 
+    def __bool__(self):
+        return bool(self.match)
+
 
 class Pattern:
 

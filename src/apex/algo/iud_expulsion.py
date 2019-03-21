@@ -19,7 +19,7 @@ IN_CERVIX = Pattern(r'(within|inside|in) (the )?(cx|cervical|cervix)',
 PARTIAL_EXP = Pattern(r'(partial\w* (expel|expul)'
                       r'|(expel|expul)\w* partial'
                       r'|(visible|found|visualiz|note|locate|position|present|identif)\w* (within|inside|in)'
-                      r' (the )?(lower uter(ine segment|us) and (the )?)?(cx|cervical|cervix|os)'
+                      r' (the )?(lower uter(ine segment|us) (and )?(the )?)?(cx|cervical|cervix|os)'
                       r'|protrud\w+ from (the )?(cx|cervical|cervix|os)'
                       r')',
                       negates=[nose, negation, 'string', 'polyp', boilerplate])
@@ -32,13 +32,11 @@ MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|fin
 COMPLETE = Pattern(r'(fell out|(spontaneous|complete)\w* exp[ue]l\w+'
                    r'|iud (note|found|seen|visualiz|locate|position|present|identif)\w*\s+(\w+\s+){,4}in vagina'
                    r')',
-                   negates=['in case', 'applicator', 'inserter', 'insertion', 'in the past', 'history',
+                   negates=['in case', 'applicator', 'inserter', 'insertion', 'in the past', 'history', r'\bh\W*o\b',
                             hypothetical, boilerplate, nose, in_place, negation, 'string', 'polyp'])
 
 STRINGS = Pattern(r'strings?', negates=['bothersome', 'noted', 'in place', 'seen',
                                         'visualized', 'cut', 'check', 'trim'])
-ANY = (PLACEMENT, MALPOSITION, MISSING,
-       VISUALIZED, PARTIAL_EXP, COMPLETE)
 
 
 class ExpulsionStatus(Status):
@@ -61,7 +59,7 @@ def confirm_iud_expulsion(document: Document, expected=None):
 
 
 def determine_iud_expulsion(document: Document):
-    if document.has_patterns(*ANY):
+    if document.has_patterns(IUD):
         for section in document.select_sentences_with_patterns(IUD):
             if section.has_patterns(INCORRECT, PLACEMENT, has_all=True) or \
                     section.has_patterns(MALPOSITION) or \
