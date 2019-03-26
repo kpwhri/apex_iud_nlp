@@ -27,8 +27,16 @@ NOT_IUD_INSERTION = Pattern(r'(implanon (was )?(placed|inserted)|'
 UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful'
                                  f'|{IUD} (can)?n[o\']t( be)? place'
                                  f'|((can)?n[o\']t|unable)( to)? place {IUD}'
-                                 r'|aborted|failed'
+                                 r'|(procedure|insertion|attempt) (was )?(aborted|failed|terminated|abandoned)'
+                                 r'|(aborted|failed|terminated|abandoned) (the )?(iud|procedure|insertion|attempt)'
                                  r')')
+SUCCESSFUL_INSERTION = Pattern(r'('
+                               r'(trim|cut|clip|snip)\w* (the )?(stri?ng|thread)'
+                               r'|(stri?ng|thread)s? ((was|were) )?(trim|cut|clip|snip)'
+                               r'|length of (stri?ng|thread)'
+                               r'|(stri?ng|thread) length'
+                               f'|{IUD} placed'
+                               r')')
 
 US = Pattern(r'(u/?s|ultrasound|radiology)',
              negates=[negation])
@@ -55,6 +63,7 @@ class DiffInsStatus(Status):
     MISOPROSTOL = 5
     UNSUCCESSFUL = 6
     NOT_DIFFICULT = 7
+    SUCCESSFUL = 8
     SKIP = 99
 
 
@@ -75,7 +84,9 @@ def determine_difficult_insertion(document: Document):
     elif document.has_patterns(IUD, ignore_negation=True):
         if document.has_patterns(UNSUCCESSFUL_INSERTION):
             yield DiffInsStatus.UNSUCCESSFUL, None
-        elif document.has_patterns(INSERTION, ignore_negation=True):
+        if document.has_patterns(SUCCESSFUL_INSERTION):
+            yield DiffInsStatus.SUCCESSFUL, None
+        if document.has_patterns(INSERTION, ignore_negation=True):
             found = False
             for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
                 if section.has_patterns(EASY_INSERTION):
@@ -96,8 +107,3 @@ def determine_difficult_insertion(document: Document):
                 if section.has_patterns(CERV_DIL):
                     yield DiffInsStatus.CERVICAL_DILATION, section.text
                     found = True
-            if not found:
-                pass
-                # yield DiffInsStatus.NONE, document.text
-        else:
-            yield DiffInsStatus.SKIP, None  # change to skip
