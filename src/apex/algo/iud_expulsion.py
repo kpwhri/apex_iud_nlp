@@ -21,7 +21,8 @@ MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
 DISPLACEMENT = Pattern(r'(\brotate\w+'
                        f'|{LOWER_UTERINE}'
                        r'|(displace|dislodge)(d|ment))',
-                       negates=[nose, hypothetical, negation, historical, boilerplate, in_place])
+                       negates=[nose, hypothetical, negation, historical, boilerplate, in_place,
+                                r'fractures?\b'])
 IN_CERVIX = Pattern(f'{INSIDE} (the )?{CX}',
                     negates=[negation])
 PARTIAL_EXP = Pattern(r'(partial\w* exp[eu]l'
