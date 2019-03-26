@@ -22,5 +22,5 @@ def test_successful_regex_match(text):
     'procedure aborted',
     'procedure terminated',
 ])
-def test_successful_regex_match(text):
+def test_unsuccessful_regex_match(text):
     assert UNSUCCESSFUL_INSERTION.matches(text)
