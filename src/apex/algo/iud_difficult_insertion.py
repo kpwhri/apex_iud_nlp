@@ -42,7 +42,7 @@ US = Pattern(r'(u/?s|ultrasound|radiology)',
              negates=[negation])
 US_USED = Pattern(r'('
                   r'guid(ed?|ance)|\bused?\b|(verif|determine|confirm)\w* (proper|correct)?'
-                  f' ({IUD} )?(place|location)'
+                  f' ({IUD} )?(place|location|rotation)'
                   r')',
                   negates=[negation])
 # uterine/uterus
