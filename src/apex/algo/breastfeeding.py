@@ -75,9 +75,10 @@ BF_BOILERPLATE_SECTION = Pattern(r'('
                                  r'|some suggestions'
                                  r').*', flags=re.IGNORECASE | re.MULTILINE)
 BF_HISTORY = Pattern(r'(breastfeeding history: y)')
-BF_EXACT = Pattern(r'(breast feeding(:|\?) y|breastfeeding: offered: y|'
-                   r'taking breast: (y|(for )\d)|'
-                   r'breast\s(feeding|milk) every \d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)? [hm]'
+BF_EXACT = Pattern(r'(breast feeding(:|\?) y'
+                   r'|breastfeeding: offered: y'
+                   r'|taking breast: (y|(for )\d)'
+                   r'|breast\s?(feeding|milk) (frequency )?every \d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)? [hm]'
                    r')')
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
                       negates=['previous', 'history', 'hx'])
