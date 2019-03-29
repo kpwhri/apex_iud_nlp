@@ -1,6 +1,6 @@
 import re
 
-from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, nose, LOWER_UTERINE, NOTED, INSIDE
+from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, misc_excl, LOWER_UTERINE, NOTED, INSIDE
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result
 from apex.algo.shared import IUD, negation, boilerplate
@@ -21,9 +21,9 @@ MALPOSITION = Pattern(r'('
                       f' (the )?{LOWER_UTERINE}'
                       r'|(inferior|distal) to (the )?(expect|desir|typical)'
                       r')',
-                      negates=[nose, negation, 'string', 'polyp', boilerplate])
+                      negates=[misc_excl, negation, 'string', 'polyp', boilerplate])
 MALPOSITION_IUD = Pattern(f'((mal position) {IUD}|{IUD} (is )?mal position)',
-                          negates=[negation, 'string', boilerplate, nose])
+                          negates=[negation, 'string', boilerplate, misc_excl])
 
 
 def confirm_iud_expulsion_rad(document: Document, expected=None):

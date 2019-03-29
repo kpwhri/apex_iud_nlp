@@ -1,6 +1,6 @@
 import pytest
 
-from apex.algo.iud_expulsion import PARTIAL_EXP, MISSING, STRINGS, DISPLACEMENT, INCORRECT, PLACEMENT
+from apex.algo.iud_expulsion import PARTIAL_EXP, MISSING, STRINGS, DISPLACEMENT, INCORRECT, PLACEMENT, PREVIOUS
 from apex.algo.iud_expulsion_rad import MALPOSITION, NOT_SEEN_IUD, IUD_NOT_SEEN, IUD_PRESENT, STRING, VISIBLE
 from apex.algo.shared import IUD
 
@@ -19,6 +19,15 @@ from apex.algo.shared import IUD
 ])
 def test_partial_regex_match(text):
     assert PARTIAL_EXP.matches(text), PARTIAL_EXP.pattern.pattern
+
+
+@pytest.mark.parametrize('text', [
+    'previous iud was expelled',
+    'history of partially expelled iud',
+    'her last iud was problematic',
+])
+def test_previous_regex_match(text):
+    assert PREVIOUS.matches(text), PREVIOUS.pattern.pattern
 
 
 @pytest.mark.parametrize('text', [
@@ -104,3 +113,11 @@ def test_not_incorrectplacement_regex_match(text):
 def test_not_stringsmissing_regex_match(text):
     """Confirm proper hst/sas"""
     assert not (MISSING.matches(text) and STRINGS.matches(text))
+
+
+@pytest.mark.parametrize('text', [
+    'previous iud was expelled recently',
+    'her last iud was problematic, falling out 10 days ago',
+])
+def test_not_previous_regex_match(text):
+    assert not PREVIOUS.matches(text), PREVIOUS.pattern.pattern
