@@ -20,7 +20,9 @@ BREAST_MILK = Pattern(f'(breast milk|lactating|milk supply|supply{words_3}milk)'
                       negates=['healthiest', 'wonders'])
 EXPRESSED_MILK = Pattern(r'(express\w+( breast)? milk)',
                          negates=[negation, hypothetical, historical, boilerplate])
-EXPRESSED_MILK_EXACT = Pattern(r'(expressed breast milk: (y|all))')
+EXPRESSED_MILK_EXACT = Pattern(
+    r'expressed breast milk: (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
+)
 LACTATION_VISIT = Pattern(r'\b(lactation) (visit|service|consult|specialist|assessment)',
                           negates=[r'\bif\b', 'please', hypothetical, '(capitol|campus|206)'])
 BF_DURATION = Pattern(r'(duration at breast|time breast feeding|total intake this feeding)')
@@ -84,7 +86,6 @@ BF_EXACT = Pattern(
     r' (x|times){0,2} \d{0,2} [hmd]'
     r'|pumping every (\d{1,2}(.\d{1,2})? (\d{1,2}(.\d{1,2})?)?)? [hm]'
     r'|feeding: breast'
-    r'|expressed breast milk: (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
     r'|intake at breast: [\d/\-\.\s]+ (ml|g|oz|ounce)'
     r')'
 )

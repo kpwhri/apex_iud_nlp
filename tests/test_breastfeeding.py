@@ -1,6 +1,6 @@
 import pytest
 
-from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT
+from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT
 
 
 @pytest.mark.parametrize('text', [
@@ -18,14 +18,20 @@ def test_bfunknown_regex_match(text):
 
 
 @pytest.mark.parametrize('text', [
+    'expressed breast milk: all',
+    'expressed breast milk: 12oz',
+    'expressed breast milk: 1/2-1 ounce total',
+])
+def test_expressedexact_regex_match(text):
+    assert EXPRESSED_MILK_EXACT.matches(text)
+
+
+@pytest.mark.parametrize('text', [
     'Breastfeeding frequency: every 2-2.5 hours one 3-4 hour interval at night',
     'pumping every 2-3 hours',
     'pumping every hour',
     'Breastfeeding frequency:8-10 x 45 minutes',
     'nursing frequency: 7-8 times/24 hours',
-    'expressed breast milk: all',
-    'expressed breast milk: 12oz',
-    'expressed breast milk: 1/2-1 ounce total',
     'Breastfeeding frequency:8x day',
     'Intake at breast: 2.5 oz',
 ])
