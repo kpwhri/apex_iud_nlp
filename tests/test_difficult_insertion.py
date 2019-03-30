@@ -10,6 +10,7 @@ from apex.algo.iud_difficult_insertion import SUCCESSFUL_INSERTION, UNSUCCESSFUL
     'strings cut',
     'threads were snipped',
     'length of string',
+    'successful removal and insertion of iud',
 ])
 def test_successful_regex_match(text):
     assert SUCCESSFUL_INSERTION.matches(text)

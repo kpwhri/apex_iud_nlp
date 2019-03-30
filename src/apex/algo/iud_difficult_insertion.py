@@ -4,7 +4,7 @@ from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 # don't include "not" "insertion not completed since..."
-from apex.algo.shared import IUD
+from apex.algo.shared import IUD, hypothetical, possible
 
 negation = r'(\bor\b|with\W*out|\bno\b|w/?o|v25|pamphlet|brochure|possib|\bif\b|please|can be)'
 past = r'(past|has had)'
@@ -29,19 +29,24 @@ UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful'
                                  f'|((can)?n[o\']t|unable)( to)? place {IUD}'
                                  r'|(procedure|insertion|attempt) (was )?(aborted|failed|terminated|abandoned)'
                                  r'|(aborted|failed|terminated|abandoned) (the )?(iud|procedure|insertion|attempt)'
-                                 r')')
+                                 r')',
+                                 negates=[possible, hypothetical])
 SUCCESSFUL_INSERTION = Pattern(r'('
                                r'(trim|cut|clip|snip)\w* (the )?(stri?ng|thread)'
                                r'|(stri?ng|thread)s? ((was|were) )?(trim|cut|clip|snip)'
                                r'|length of (stri?ng|thread)'
                                r'|(stri?ng|thread) length'
                                f'|{IUD} placed'
-                               r')')
+                               f'|successful(ly)? ((removal and|{IUD}) )?insert'
+                               r'|insert\w+ success'
+                               r')',
+                               negates=[possible, hypothetical])
 
-US = Pattern(r'(u/?s|ultrasound|radiology)',
+US = Pattern(r'(\bu/?s\b|ultrasound|radiology)',
              negates=[negation])
 US_USED = Pattern(r'('
-                  r'guid(ed?|ance)|\bused?\b|(verif|determine|confirm)\w* (proper|correct)?'
+                  r'guid(ed?|ance)|\bused?\b'
+                  r'|(verif|determine|confirm)\w* (proper|correct)?'
                   f' ({IUD} )?(place|location|rotation)'
                   r')',
                   negates=[negation])
@@ -83,9 +88,9 @@ def determine_difficult_insertion(document: Document):
         yield DiffInsStatus.SKIP, None
     elif document.has_patterns(IUD, ignore_negation=True):
         if document.has_patterns(UNSUCCESSFUL_INSERTION):
-            yield DiffInsStatus.UNSUCCESSFUL, None
+            yield DiffInsStatus.UNSUCCESSFUL, document.text
         if document.has_patterns(SUCCESSFUL_INSERTION):
-            yield DiffInsStatus.SUCCESSFUL, None
+            yield DiffInsStatus.SUCCESSFUL, document.text
         if document.has_patterns(INSERTION, ignore_negation=True):
             found = False
             for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
