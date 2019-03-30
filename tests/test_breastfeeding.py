@@ -18,7 +18,16 @@ def test_bfunknown_regex_match(text):
 
 
 @pytest.mark.parametrize('text', [
-    '9.	Breastfeeding frequency: every 2-2.5 hours one 3-4 hour interval at night',
+    'Breastfeeding frequency: every 2-2.5 hours one 3-4 hour interval at night',
+    'pumping every 2-3 hours',
+    'pumping every hour',
+    'Breastfeeding frequency:8-10 x 45 minutes',
+    'nursing frequency: 7-8 times/24 hours',
+    'expressed breast milk: all',
+    'expressed breast milk: 12oz',
+    'expressed breast milk: 1/2-1 ounce total',
+    'Breastfeeding frequency:8x day',
+    'Intake at breast: 2.5 oz',
 ])
 def test_bfexact_regex_match(text):
     assert BF_EXACT.matches(text)

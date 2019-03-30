@@ -22,7 +22,7 @@ EXPRESSED_MILK = Pattern(r'(express\w+( breast)? milk)',
                          negates=[negation, hypothetical, historical, boilerplate])
 EXPRESSED_MILK_EXACT = Pattern(r'(expressed breast milk: (y|all))')
 LACTATION_VISIT = Pattern(r'\b(lactation) (visit|service|consult|specialist|assessment)',
-                          negates=[r'\bif\b', 'please', hypothetical])
+                          negates=[r'\bif\b', 'please', hypothetical, '(capitol|campus|206)'])
 BF_DURATION = Pattern(r'(duration at breast|time breast feeding|total intake this feeding)')
 BF_TYPE = Pattern(r'(feeding methods? breast|type feeding breast)')
 BF_UNKNOWN = Pattern(r'('
@@ -73,16 +73,25 @@ BF_BOILERPLATE_SECTION = Pattern(r'('
                                  r'|what to expect'
                                  r'|information for parents and caregivers'
                                  r'|some suggestions'
+                                 r'|things to start thinking about'
                                  r').*', flags=re.IGNORECASE | re.MULTILINE)
 BF_HISTORY = Pattern(r'(breastfeeding history: y)')
-BF_EXACT = Pattern(r'(breast feeding(:|\?) y'
-                   r'|breastfeeding: offered: y'
-                   r'|taking breast: (y|(for )\d)'
-                   r'|breast\s?(feeding|milk) (frequency )?every \d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)? [hm]'
-                   r')')
+BF_EXACT = Pattern(
+    r'(breast feeding(:|\?) y'
+    r'|breastfeeding: offered: y'
+    r'|taking breast: (y|(for )\d)'
+    r'|(breast\s?(feeding|milk)|nursing) (frequency )?(every )?\d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)?'
+    r' (x|times){0,2} \d{0,2} [hmd]'
+    r'|pumping every (\d{1,2}(.\d{1,2})? (\d{1,2}(.\d{1,2})?)?)? [hm]'
+    r'|feeding: breast'
+    r'|expressed breast milk: (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
+    r'|intake at breast: [\d/\-\.\s]+ (ml|g|oz|ounce)'
+    r')'
+)
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
                       negates=['previous', 'history', 'hx'])
-BF_YES = Pattern(r'(breast feeding well|(is|been) breast feeding'
+BF_YES = Pattern(r'(breast feeding well'
+                 r'|(pt|is|been) ((currently|now|presently) )?breast feeding'
                  r'|breast feeding without difficulty|still (breast feeding|nurses)'
                  r'|continues to breast feed)',
                  negates=[negation, hypothetical])
@@ -99,7 +108,7 @@ BF_SUPPLEMENT = Pattern(r'supplement breast feeding',
 BF_STOP = Pattern(r'(stop\w+|no longer|quit) (breast feeding|nursing)',
                   negates=[negation, hypothetical, historical, boilerplate,
                            'for a few days', 'had', 'on that side', 'cause', 'conflicted',
-                           'thinking', 'planning', 'since'])
+                           'thinking', 'planning', 'since', 'start', 'process'])
 # handle "7 mo infant, stopped breastfeeding at approx 1 mo age"
 BF_STOP_BAD = Pattern(r'('
                       r'\d{1,2} \b(wk?|week|mo?|month|yr?|year)s?\b'
@@ -181,13 +190,14 @@ def determine_breastfeeding(document: Document, expected=None):
             # only non-boilerplate
             if section.has_patterns(NIPPLE_SHIELD, BF_SUPPLEMENT):
                 yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
-            cnt = section.has_patterns(BREAST_MILK, BF, PUMPING, EXPRESSED_MILK, MILK_TRANSFER, get_count=True)
+            cnt = section.has_patterns(BREAST_MILK, BF, PUMPING,
+                                       EXPRESSED_MILK, MILK_TRANSFER,
+                                       BREAST_PAIN,
+                                       get_count=True)
             if cnt:
                 non_exact_count += cnt
                 non_exact_count_snippets.append(section.text)
             if section.has_patterns(LACTATION_VISIT):
                 yield my_result(BreastfeedingStatus.LACTATION_VISIT, text=section.text)
-            if section.has_patterns(BREAST_PAIN):
-                yield my_result(BreastfeedingStatus.BREAST_PAIN, text=section.text)
     if non_exact_count >= 2:
         yield my_result(BreastfeedingStatus.MAYBE, text='\n'.join(non_exact_count_snippets))
