@@ -1,3 +1,5 @@
+import glob
+import os
 import random
 import sys
 from collections import defaultdict
@@ -6,9 +8,10 @@ from cronkd.util.docx import add_table_of_contents
 from docx import Document
 
 
-def snippet_samples(fp, sample=25, encoding='utf8'):
+def snippet_samples(fp, sample=25, encoding='utf8', pattern='text_*.out'):
     res = defaultdict(lambda: defaultdict(set))
-    with open(fp, encoding=encoding) as fh:
+    fn = sorted(glob.glob(os.path.join(fp, pattern)))[-1]
+    with open(fn, encoding=encoding) as fh:
         for i, line in enumerate(fh):
             if i == 0:
                 continue
@@ -23,7 +26,7 @@ def snippet_samples(fp, sample=25, encoding='utf8'):
             doc.add_heading(cat, level=2)
             for example in random.sample(s, min(sample, len(s))):
                 doc.add_paragraph(example, style='List Number')
-    doc.save(f'{fp}.docx')
+    doc.save(f'{fn}.docx')
 
 
 if __name__ == '__main__':
