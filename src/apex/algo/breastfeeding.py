@@ -3,7 +3,7 @@ from functools import partial
 
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
-from apex.algo.shared import hypothetical, negation, historical, boilerplate
+from apex.algo.shared import hypothetical, negation, historical, boilerplate, possible
 
 pain = r'(sore|pain\w*|infection|excoriat\w+|infection|yeast|candida|engorg\w+)'
 breast = r'(breast|nipple)'
@@ -21,7 +21,10 @@ BREAST_MILK = Pattern(f'(breast milk|lactating|milk supply|supply{words_3}milk)'
 EXPRESSED_MILK = Pattern(r'(express\w+( breast)? milk)',
                          negates=[negation, hypothetical, historical, boilerplate])
 EXPRESSED_MILK_EXACT = Pattern(
+    r'('
     r'expressed breast milk: (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
+    r'|(oz|ounces?|g|ml) of expressed breast milk'
+    r')'
 )
 LACTATION_VISIT = Pattern(r'\b(lactation) (visit|service|consult|specialist|assessment)',
                           negates=[r'\bif\b', 'please', hypothetical, '(capitol|campus|206|253)'])
@@ -105,6 +108,8 @@ BF = Pattern(r'(feed\w+ breast|breast feeding|breast fed|\bbf\b)',
 FORMULA_EXACT = Pattern(r'(formula offered: y|formula: y)', space_replace=r'\s*')
 FORMULA_NO = Pattern(r'(formula: no)')
 PUMPING_EXACT = Pattern(r'(yes breast pump|problems with pumping: no)')
+PUMPING_ACTIVE = Pattern(r'(breast pumping|is using( a)? breast pump)',
+                         negates=[negation, hypothetical, historical, possible])
 PUMPING = Pattern(r'(breast pump)',
                   negates=[negation, hypothetical, historical, boilerplate])
 BOTTLE_EXACT = Pattern(r'(taking bottle: y|method: bottle)')
@@ -179,7 +184,7 @@ def determine_breastfeeding(document: Document, expected=None):
             yield my_result(BreastfeedingStatus.FORMULA, text=section.text)
         if section.has_patterns(FORMULA_NO):
             yield my_result(BreastfeedingStatus.NO_FORMULA, text=section.text)
-        if section.has_patterns(PUMPING_EXACT):
+        if section.has_patterns(PUMPING_EXACT, PUMPING_ACTIVE):
             yield my_result(BreastfeedingStatus.PUMPING, text=section.text)
         if section.has_patterns(BOTTLE_EXACT):
             yield my_result(BreastfeedingStatus.BOTTLE, text=section.text)

@@ -1,6 +1,7 @@
 import pytest
 
-from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES
+from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES, \
+    PUMPING_ACTIVE, NIPPLE_SHIELD
 
 
 @pytest.mark.parametrize('text', [
@@ -22,6 +23,21 @@ def test_yes_regex_match(text):
 
 
 @pytest.mark.parametrize('text', [
+    'weaning from nipple shield'
+])
+def test_nippleshield_regex_match(text):
+    assert NIPPLE_SHIELD.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'breast pumping',
+    'is using a breast pump',
+])
+def test_pumpactive_regex_match(text):
+    assert PUMPING_ACTIVE.matches(text)
+
+
+@pytest.mark.parametrize('text', [
     'Breastfeeding: {YES NO:17553}',
 ])
 def test_bfunknown_regex_match(text):
@@ -32,6 +48,7 @@ def test_bfunknown_regex_match(text):
     'expressed breast milk: all',
     'expressed breast milk: 12oz',
     'expressed breast milk: 1/2-1 ounce total',
+    '10-20ml of expressed breastmilk',
 ])
 def test_expressedexact_regex_match(text):
     assert EXPRESSED_MILK_EXACT.matches(text)
@@ -67,3 +84,14 @@ def test_not_lactationvisit_regex_match(text):
 ])
 def test_not_yes_regex_match(text):
     assert not BF_YES.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'not initiating breast pumping',
+    'Breast pumping and galactogogue therapy may help',
+])
+def test_not_pumpactive_regex_match(text):
+    assert not PUMPING_ACTIVE.matches(text)
+
+
+'Problems with breastfeeding? no'
