@@ -24,9 +24,9 @@ EXPRESSED_MILK_EXACT = Pattern(
     r'expressed breast milk: (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
 )
 LACTATION_VISIT = Pattern(r'\b(lactation) (visit|service|consult|specialist|assessment)',
-                          negates=[r'\bif\b', 'please', hypothetical, '(capitol|campus|206)'])
+                          negates=[r'\bif\b', 'please', hypothetical, '(capitol|campus|206|253)'])
 BF_DURATION = Pattern(r'(duration at breast|time breast feeding|total intake this feeding)')
-BF_TYPE = Pattern(r'(feeding methods? breast|type feeding breast)')
+BF_TYPE = Pattern(r'(feeding methods? breast|type feeding breast|nourishment method breast)')
 BF_UNKNOWN = Pattern(r'('
                      r'breast feeding (\*|na|yes/no/na|not applicable)'
                      r'|breast feeding: YES NO'
@@ -91,11 +91,15 @@ BF_EXACT = Pattern(
 )
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
                       negates=['previous', 'history', 'hx'])
-BF_YES = Pattern(r'(breast feeding well'
-                 r'|(pt|is|been) ((currently|now|presently) )?breast feeding'
-                 r'|breast feeding without difficulty|still (breast feeding|nurses)'
-                 r'|continues to breast feed)',
-                 negates=[negation, hypothetical])
+BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?well'
+                 r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b)'
+                 r'|breast feeding without difficulty'
+                 r'|still (\bbf\b|breast feeding|nurses)'
+                 r'|continues to breast feed'
+                 r'|(exclusive|current)ly breast feeding'
+                 r'|breast feeding exclusively'
+                 r')',
+                 negates=[negation, hypothetical, 'advise', 'some'])
 BF = Pattern(r'(feed\w+ breast|breast feeding|breast fed|\bbf\b)',
              negates=[negation, hypothetical, historical, boilerplate])
 FORMULA_EXACT = Pattern(r'(formula offered: y|formula: y)', space_replace=r'\s*')
@@ -114,6 +118,9 @@ BF_STOP = Pattern(r'(stop\w+|no longer|quit) (breast feeding|nursing)',
 BF_STOP_BAD = Pattern(r'('
                       r'\d{1,2} \b(wk?|week|mo?|month|yr?|year)s?\b'
                       r'|\b[ap]m\b'
+                      r'|\bpump'
+                      r'|resumed'
+                      r'|bottle'
                       r')')
 AGO = Pattern(r'\bago\b')
 
@@ -183,6 +190,7 @@ def determine_breastfeeding(document: Document, expected=None):
                 yield my_result(BreastfeedingStatus.STOPPED_BEFORE, text=section.text)
             else:  # "stopped"
                 yield my_result(BreastfeedingStatus.STOP, text=section.text)
+            found_bf = True
         if section.has_patterns(LATCHING):
             yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
             found_bf = True

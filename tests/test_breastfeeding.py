@@ -1,6 +1,6 @@
 import pytest
 
-from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT
+from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES
 
 
 @pytest.mark.parametrize('text', [
@@ -8,6 +8,17 @@ from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO
 ])
 def test_lactationvisit_regex_match(text):
     assert LACTATION_VISIT.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'breastfeeding has been going well',
+    'pt breastfeeding well',
+    'breastfeeding exclusively',
+    'exclusively breastfeeding',
+    'currently breastfeeding',
+])
+def test_yes_regex_match(text):
+    assert BF_YES.matches(text)
 
 
 @pytest.mark.parametrize('text', [
@@ -40,7 +51,6 @@ def test_bfexact_regex_match(text):
     assert not BF_NO_EXACT.matches(text)
 
 
-
 # NOT
 
 @pytest.mark.parametrize('text', [
@@ -49,3 +59,11 @@ def test_bfexact_regex_match(text):
 ])
 def test_not_lactationvisit_regex_match(text):
     assert not LACTATION_VISIT.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'advised exclusively breastfeeding',
+    'Some exclusively breast feeding babies stool infrequently',
+])
+def test_not_yes_regex_match(text):
+    assert not BF_YES.matches(text)
