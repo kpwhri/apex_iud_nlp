@@ -84,6 +84,7 @@ def test_not_lactationvisit_regex_match(text):
 @pytest.mark.parametrize('text', [
     'advised exclusively breastfeeding',
     'Some exclusively breast feeding babies stool infrequently',
+    'ideally after breast-feeding exclusively',
 ])
 def test_not_yes_regex_match(text):
     assert not BF_YES.matches(text)

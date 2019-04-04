@@ -31,4 +31,4 @@ safe_may = r'(?<!in|st|ce) may (?!\d)'
 hypothetical = r'(option|possib\w+|desire|want|will|\bcan\b|usual|' \
                r'\bor\b|like|would|need|until|request|when|you ll|' \
                r'\bif\b|consider|concern|return|nervous|anxious|to be remov|could|' \
-               r'discuss|inform|should|\btry|once|worr(y|ied)|question)'
+               r'discuss|inform|should|\btry|once|worr(y|ied)|question|ideal)'

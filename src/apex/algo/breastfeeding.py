@@ -17,7 +17,7 @@ NIPPLE_SHIELD = Pattern(r'((us(es|ing)|wean\w+ from|yes|with)( the)? nipple shie
                         negates=[negation, hypothetical, historical, boilerplate])
 MILK_TRANSFER = Pattern('(milk transfer)')
 BREAST_MILK = Pattern(f'(breast milk|lactating|milk supply|supply{words_3}milk)',
-                      negates=['healthiest', 'wonders'])
+                      negates=['healthiest', 'wonders', 'orientation'])
 EXPRESSED_MILK = Pattern(r'(express\w+( breast)? milk)',
                          negates=[negation, hypothetical, historical, boilerplate])
 EXPRESSED_MILK_EXACT = Pattern(
@@ -95,7 +95,7 @@ BF_EXACT = Pattern(
 )
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
                       negates=['previous', 'history', 'hx', 'problems'])
-BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?well'
+BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?(very )?well'
                  r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b)'
                  r'|breast feeding without difficulty'
                  r'|still (\bbf\b|breast feeding|nurses)'
