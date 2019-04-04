@@ -4,14 +4,14 @@ from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
 # don't include "not" "insertion not completed since..."
-from apex.algo.shared import IUD, hypothetical, possible
+from apex.algo.shared import IUD, hypothetical, possible, historical
 
 negation = r'(\bor\b|with\W*out|\bno\b|w/?o|v25|pamphlet|brochure|possib|\bif\b|please|can be)'
 past = r'(past|has had)'
 other = r'(friends?)'
 difficult = r'(remember)'
 
-INSERTION = Pattern(r'insert(ed|ion)', negates=[past])
+INSERTION = Pattern(r'insert(ed|ion)', negates=[past, 'forcep', 'clamp'])
 EASY_INSERTION = Pattern(r'(uncomplicat\w+|with out (difficulty|complication)|easily|'
                          r'complications? none|with ease)',
                          negates=['v25'])
@@ -24,13 +24,20 @@ PROVIDER = Pattern(r'(difficult|\bcomplicat\w*|(with|more) traction|'
 NOT_IUD_INSERTION = Pattern(r'(implanon (was )?(placed|inserted)|'
                             f'{IUD} removal'
                             r')')
+CANNOT_PLACE = Pattern(
+    r'('
+    f'{IUD} (can)?n[o\']t( be)? place'
+    f'|((can)?n[o\']t|unable)( to)? place {IUD}'
+    f'|{IUD} (placement|insertion|attempt) (unsuccessful|failed|abandoned|aborted)'
+    r')',
+    negates=[possible, hypothetical, historical, r'\bi\b', r'\bdoes\b']
+)
 UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful'
-                                 f'|{IUD} (can)?n[o\']t( be)? place'
-                                 f'|((can)?n[o\']t|unable)( to)? place {IUD}'
                                  r'|(procedure|insertion|attempt) (was )?(aborted|failed|terminated|abandoned)'
                                  r'|(aborted|failed|terminated|abandoned) (the )?(iud|procedure|insertion|attempt)'
                                  r')',
-                                 negates=[possible, hypothetical])
+                                 negates=[possible, hypothetical, historical, 'string', 'speculum',
+                                          'brush', 'forcep', 'clamp', r'remov\w+'])
 SUCCESSFUL_INSERTION = Pattern(r'('
                                r'(trim|cut|clip|snip)\w* (the )?(stri?ng|thread)'
                                r'|(stri?ng|thread)s? ((was|were) )?(trim|cut|clip|snip)'
@@ -86,12 +93,14 @@ def determine_difficult_insertion(document: Document):
     """
     if document.has_patterns(NOT_IUD_INSERTION):
         yield DiffInsStatus.SKIP, None
+    if document.has_patterns(CANNOT_PLACE):
+        yield DiffInsStatus.UNSUCCESSFUL, document.text
     elif document.has_patterns(IUD, ignore_negation=True):
-        if document.has_patterns(UNSUCCESSFUL_INSERTION):
-            yield DiffInsStatus.UNSUCCESSFUL, document.text
-        if document.has_patterns(SUCCESSFUL_INSERTION):
-            yield DiffInsStatus.SUCCESSFUL, document.text
         if document.has_patterns(INSERTION, ignore_negation=True):
+            if document.has_patterns(UNSUCCESSFUL_INSERTION, INSERTION, has_all=True):
+                yield DiffInsStatus.UNSUCCESSFUL, document.text
+            if document.has_patterns(SUCCESSFUL_INSERTION, INSERTION, has_all=True):
+                yield DiffInsStatus.SUCCESSFUL, document.text
             found = False
             for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
                 if section.has_patterns(EASY_INSERTION):

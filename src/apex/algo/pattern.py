@@ -116,6 +116,42 @@ class MatchCask:
         return str(set(m.group() for m in self.matches))
 
 
+class Sentences:
+
+    def __init__(self, text, matches):
+        self.sentences = [Sentence(x, matches) for x in text.split('\n') if x.strip()]
+
+    def has_pattern(self, pat, ignore_negation=False):
+        for sentence in self.sentences:
+            if sentence.has_pattern(pat, ignore_negation=ignore_negation):
+                return True
+        return False
+
+    def has_patterns(self, *pats, has_all=False, ignore_negation=False):
+        for pat in pats:
+            if has_all and not self.has_pattern(pat, ignore_negation=ignore_negation):
+                return False
+            elif not has_all and self.has_pattern(pat, ignore_negation=ignore_negation):
+                return True
+        return has_all
+
+    def get_pattern(self, pat, index=0):
+        for sentence in self.sentences:
+            m = sentence.get_pattern(pat, index=index)
+            if m:
+                return m
+        return None
+
+    def __len__(self):
+        return len(self.sentences)
+
+    def __iter__(self):
+        return iter(self.sentences)
+
+    def __getitem__(self, item):
+        return self.sentences[item]
+
+
 class Sentence:
 
     def __init__(self, text, mc: MatchCask = None):
@@ -233,7 +269,7 @@ class Document:
             raise ValueError(f'Missing text for {name}, file: {file}')
         # remove history section
         self.new_text = self._clean_text(self.HISTORY_REMOVAL.sub('\n', self.text))
-        self.sentences = [Sentence(x, self.matches) for x in self.new_text.split('\n') if x.strip()]
+        self.sentences = Sentences(self.new_text, self.matches)
 
     def _clean_text(self, text):
         pat = re.compile(r'(Breastfeeding)\?\n((?:yes|no)\w*)', re.I)
@@ -245,11 +281,21 @@ class Document:
             text = pat.sub('', text)
         return Document(self.name, text=text)
 
-    def has_pattern(self, pat, ignore_negation=False):
-        m = pat.matches(self.text, ignore_negation=ignore_negation)
-        if m:
-            self.matches.add(m)
-        return bool(m)
+    def has_pattern(self, pat, ignore_negation=False, by_sentence=True):
+        """
+        Look for patterns and their negation by sentence
+        :param pat:
+        :param ignore_negation:
+        :param by_sentence:
+        :return:
+        """
+        if by_sentence:
+            return self.sentences.has_pattern(pat, ignore_negation=ignore_negation)
+        else:
+            m = pat.matches(self.text, ignore_negation=ignore_negation)
+            if m:
+                self.matches.add(m)
+            return bool(m)
 
     def get_pattern(self, pat, index=0):
         m = pat.matches(self.text)
@@ -277,11 +323,11 @@ class Document:
                 return res
         return None
 
-    def has_patterns(self, *pats, has_all=False, ignore_negation=False):
+    def has_patterns(self, *pats, has_all=False, ignore_negation=False, by_sentence=True):
         for pat in pats:
-            if has_all and not self.has_pattern(pat, ignore_negation):
+            if has_all and not self.has_pattern(pat, ignore_negation, by_sentence=by_sentence):
                 return False
-            elif not has_all and self.has_pattern(pat, ignore_negation):
+            elif not has_all and self.has_pattern(pat, ignore_negation, by_sentence=by_sentence):
                 return True
         return has_all
 

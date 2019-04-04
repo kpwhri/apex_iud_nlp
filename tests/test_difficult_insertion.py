@@ -1,6 +1,6 @@
 import pytest
 
-from apex.algo.iud_difficult_insertion import SUCCESSFUL_INSERTION, UNSUCCESSFUL_INSERTION
+from apex.algo.iud_difficult_insertion import SUCCESSFUL_INSERTION, UNSUCCESSFUL_INSERTION, CANNOT_PLACE
 
 
 @pytest.mark.parametrize('text', [
@@ -22,6 +22,16 @@ def test_successful_regex_match(text):
     'unsuccessful due to narrow os',
     'procedure aborted',
     'procedure terminated',
+    'I apologize for my unsuccessful insertion of your IUD',
 ])
 def test_unsuccessful_regex_match(text):
     assert UNSUCCESSFUL_INSERTION.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'history of pcos and failed iud insertion',
+    'i don\'t place iuds',
+    'i do not place iuds',
+])
+def test_not_cannotplace_regex_match(text):
+    assert not CANNOT_PLACE.matches(text)
