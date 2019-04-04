@@ -91,4 +91,4 @@ def determine_iud_expulsion(document: Document):
             if section.has_patterns(MISSING, STRINGS, has_all=True):
                 yield ExpulsionStatus.MISSING_STRING, history, section.text
     else:
-        yield ExpulsionStatus.SKIP, document.text
+        yield ExpulsionStatus.SKIP, None, document.text
