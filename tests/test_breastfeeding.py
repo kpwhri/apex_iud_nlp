@@ -64,6 +64,7 @@ def test_expressedexact_regex_match(text):
     'Intake at breast: 2.5 oz',
     'breast feeding every 3-4 hours for 10 minutes per side',
     'nutrition: both breast and ebm',
+    'Problems with breastfeeding: yes',  # problems imply breastfeeding ongoing
 ])
 def test_bfexact_regex_match(text):
     assert BF_EXACT.matches(text)
