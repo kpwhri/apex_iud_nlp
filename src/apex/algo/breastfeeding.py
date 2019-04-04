@@ -89,11 +89,12 @@ BF_EXACT = Pattern(
     r' (x|times){0,2} \d{0,2} [hmd]'
     r'|pumping every (\d{1,2}(.\d{1,2})? (\d{1,2}(.\d{1,2})?)?)? [hm]'
     r'|feeding: breast'
+    r'|nutrition: (both|continue to|from)? breast'
     r'|intake at breast: [\d/\-\.\s]+ (ml|g|oz|ounce)'
     r')'
 )
 BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
-                      negates=['previous', 'history', 'hx'])
+                      negates=['previous', 'history', 'hx', 'problems'])
 BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?well'
                  r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b)'
                  r'|breast feeding without difficulty'

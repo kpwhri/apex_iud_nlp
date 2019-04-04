@@ -62,6 +62,8 @@ def test_expressedexact_regex_match(text):
     'nursing frequency: 7-8 times/24 hours',
     'Breastfeeding frequency:8x day',
     'Intake at breast: 2.5 oz',
+    'breast feeding every 3-4 hours for 10 minutes per side',
+    'nutrition: both breast and ebm',
 ])
 def test_bfexact_regex_match(text):
     assert BF_EXACT.matches(text)
@@ -94,4 +96,8 @@ def test_not_pumpactive_regex_match(text):
     assert not PUMPING_ACTIVE.matches(text)
 
 
-'Problems with breastfeeding? no'
+@pytest.mark.parametrize('text', [
+    'Problems with breastfeeding: no',
+])
+def test_not_bfno_regex_match(text):
+    assert not BF_NO_EXACT.matches(text)
