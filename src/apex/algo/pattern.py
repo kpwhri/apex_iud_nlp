@@ -232,8 +232,12 @@ class Document:
         if not self.text:
             raise ValueError(f'Missing text for {name}, file: {file}')
         # remove history section
-        new_text = self.HISTORY_REMOVAL.sub('\n', self.text)
-        self.sentences = [Sentence(x, self.matches) for x in new_text.split('\n') if x.strip()]
+        self.new_text = self._clean_text(self.HISTORY_REMOVAL.sub('\n', self.text))
+        self.sentences = [Sentence(x, self.matches) for x in self.new_text.split('\n') if x.strip()]
+
+    def _clean_text(self, text):
+        pat = re.compile(r'(Breastfeeding)\?\n((?:yes|no)\w*)', re.I)
+        return pat.sub(r'\1: \2', text)
 
     def remove_patterns(self, *pats, ignore_negation=False):
         text = self.text
