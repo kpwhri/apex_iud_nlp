@@ -7,19 +7,30 @@ from apex.algo.result import Status, Result
 from apex.algo.shared import IUD, hypothetical, possible, historical
 
 negation = r'(\bor\b|with\W*out|\bno\b|w/?o|v25|pamphlet|brochure|possib|\bif\b|please|can be)'
-past = r'(past|has had)'
+past = r'(past|has had|prior|previous)'
 other = r'(friends?)'
 difficult = r'(remember)'
 
-INSERTION = Pattern(r'insert(ed|ion)', negates=[past, 'forcep', 'clamp'])
+INSERTION = Pattern(r'(insert(ed|ion)|\bplace)', negates=[past, 'forcep', 'clamp', 'stick',
+                                                          'scope', 'needle', 'gauge', 'since',
+                                                          'pipelle', 'pipette'])
 EASY_INSERTION = Pattern(r'(uncomplicat\w+|with out (difficulty|complication)|easily|'
                          r'complications? none|with ease)',
                          negates=['v25'])
-PROVIDER = Pattern(r'(difficult|\bcomplicat\w*|(with|more) traction|'
-                   r'excessive (instrument|force)|challeng|'
-                   r'cervi\w+ (stenosi|tight)|(stenosi|tight)\w+ cervi'
+PROVIDER = Pattern(r'('
+                   r'difficult'
+                   r'|\bcomplicat\w*'
+                   r'|(with|more) traction'
+                   r'|excessive (instrument|force)'
+                   r'|challeng'
+                   r'|cervi\w+ (stenosi|tight)'
+                   r'|(stenosi|tight)\w+ cervi'
+                   r'|cervix stenotic'
+                   r'|stenotic (cervix|internal os)'
                    r')',
-                   negates=[negation, other, difficult])
+                   negates=[negation, other, difficult, 'schedule', 'sleeping', 'risk',
+                            'alternative', 'pregnancy', 'remov(al|ed)',
+                            r'visualiz\w+'])
 
 NOT_IUD_INSERTION = Pattern(r'(implanon (was )?(placed|inserted)|'
                             f'{IUD} removal'
@@ -37,7 +48,8 @@ UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful'
                                  r'|(aborted|failed|terminated|abandoned) (the )?(iud|procedure|insertion|attempt)'
                                  r')',
                                  negates=[possible, hypothetical, historical, 'string', 'speculum',
-                                          'brush', 'forcep', 'clamp', r'remov\w+'])
+                                          'brush', 'forcep', 'clamp', r'remov\w+', 'scope', 'needle',
+                                          'gauge', past, 'aspiration', 'essure'])
 SUCCESSFUL_INSERTION = Pattern(r'('
                                r'(trim|cut|clip|snip)\w* (the )?(stri?ng|thread)'
                                r'|(stri?ng|thread)s? ((was|were) )?(trim|cut|clip|snip)'
@@ -46,24 +58,25 @@ SUCCESSFUL_INSERTION = Pattern(r'('
                                f'|{IUD} placed'
                                f'|successful(ly)? ((removal and|{IUD}) )?insert'
                                r'|insert\w+ success'
+                               r'|is scheduled for removal'
                                r')',
                                negates=[possible, hypothetical])
 
-US = Pattern(r'(\bu/?s\b|ultrasound|radiology)',
+US = Pattern(r'(\bu/?s\b|ultrasound|radiology|\bsono(gram)?\b|\bvpus\b)',
              negates=[negation])
 US_USED = Pattern(r'('
                   r'guid(ed?|ance)|\bused?\b'
-                  r'|(verif|determine|confirm)\w* (proper|correct)?'
+                  r'|(verif|determine|confirm|assure)\w* (proper|correct)?'
                   f' ({IUD} )?(place|location|rotation)'
                   r')',
                   negates=[negation])
 # uterine/uterus
 CERV_DIL = Pattern(r'(cervical (dilat|ripen)\w+|(dilat|ripen)\w*( of)?( the?) cervix)',
                    negates=[negation])
-PARACERV = Pattern(r'(\blido\b|\w+caine\b|paracervical block)',
+PARACERV = Pattern(r'(\blido\b|hurricane|\w+caine\b|paracervical block)',
                    negates=[negation])
-MISPROSTOL = Pattern(r'(cytotec|misoprostol)',
-                     negates=[negation])
+MISOPROSTOL = Pattern(r'(cytotec|misoprost[aoi]l|\bmiso\b)',
+                      negates=[negation, 'lack of', 'not done'])
 
 
 class DiffInsStatus(Status):
@@ -115,7 +128,7 @@ def determine_difficult_insertion(document: Document):
                 if section.has_patterns(PARACERV):
                     yield DiffInsStatus.PARACERVICAL_BLOCK, section.text
                     found = True
-                if section.has_patterns(MISPROSTOL):
+                if section.has_patterns(MISOPROSTOL):
                     yield DiffInsStatus.MISOPROSTOL, section.text
                     found = True
                 if section.has_patterns(CERV_DIL):

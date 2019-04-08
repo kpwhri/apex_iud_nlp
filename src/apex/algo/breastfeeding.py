@@ -81,6 +81,13 @@ BF_BOILERPLATE_SECTION = Pattern(r'('
                                  r'|things to start thinking about'
                                  r').*', flags=re.IGNORECASE | re.MULTILINE)
 BF_HISTORY = Pattern(r'(breastfeeding history: y)')
+BF_FEEDING = Pattern(
+    r'('
+    r'feeding: breast'
+    r'|nutrition: (both|continue to|from)? breast'
+    r')',
+    negates=['Teaching/Guidance:', 'Discussed:']
+)
 BF_EXACT = Pattern(
     r'(breast feeding(:|\?) y'
     r'|breastfeeding: offered: y'
@@ -88,8 +95,6 @@ BF_EXACT = Pattern(
     r'|(breast\s?(feeding|milk)|nursing) (frequency )?(every )?\d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)?'
     r' (x|times){0,2} \d{0,2} [hmd]'
     r'|pumping every (\d{1,2}(.\d{1,2})? (\d{1,2}(.\d{1,2})?)?)? [hm]'
-    r'|feeding: breast'
-    r'|nutrition: (both|continue to|from)? breast'
     r'|intake at breast: [\d/\-\.\s]+ (ml|g|oz|ounce)'
     r')'
 )
@@ -171,7 +176,7 @@ def determine_breastfeeding(document: Document, expected=None):
     for section in document.select_sentences_with_patterns(ANY_BREAST):
         found_bf = False
         # pre boilerplate patterns: exact/not confused with boilerplate
-        if section.has_patterns(BF_EXACT, BF_DURATION, BF_TYPE, BF_YES):
+        if section.has_patterns(BF_EXACT, BF_DURATION, BF_TYPE, BF_YES, BF_FEEDING):
             yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
             found_bf = True
         if section.has_patterns(BF_NO_EXACT):
@@ -205,6 +210,8 @@ def determine_breastfeeding(document: Document, expected=None):
             # only non-boilerplate
             if section.has_patterns(NIPPLE_SHIELD, BF_SUPPLEMENT):
                 yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
+            if section.has_pattern(BF_FEEDING, ignore_negation=True):
+                yield my_result(BreastfeedingStatus.MAYBE, text=section.text)
             cnt = section.has_patterns(BREAST_MILK, BF, PUMPING,
                                        EXPRESSED_MILK, MILK_TRANSFER,
                                        BREAST_PAIN,

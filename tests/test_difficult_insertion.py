@@ -1,6 +1,31 @@
 import pytest
 
-from apex.algo.iud_difficult_insertion import SUCCESSFUL_INSERTION, UNSUCCESSFUL_INSERTION, CANNOT_PLACE
+from apex.algo.iud_difficult_insertion import SUCCESSFUL_INSERTION, UNSUCCESSFUL_INSERTION, CANNOT_PLACE, PROVIDER, \
+    MISOPROSTOL
+
+
+@pytest.mark.parametrize('text', [
+    'Dr attempted insertion on 4/1/03 but had difficulty due to tight cervical os',
+    'dilation was difficult',
+])
+def test_provider(text):
+    assert PROVIDER.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'miso',
+    'misoprostol',
+])
+def test_misoprostol(text):
+    assert MISOPROSTOL.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'lack of miso',
+    'misoprostol not done',
+])
+def test_not_misoprostol(text):
+    assert not MISOPROSTOL.matches(text)
 
 
 @pytest.mark.parametrize('text', [
@@ -35,3 +60,11 @@ def test_unsuccessful_regex_match(text):
 ])
 def test_not_cannotplace_regex_match(text):
     assert not CANNOT_PLACE.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'cervix difficult to visualize',
+    'complicated removal of existing IUD',
+])
+def test_not_provider(text):
+    assert not PROVIDER.matches(text)

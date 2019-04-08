@@ -1,7 +1,7 @@
 import pytest
 
 from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES, \
-    PUMPING_ACTIVE, NIPPLE_SHIELD
+    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING
 
 
 @pytest.mark.parametrize('text', [
@@ -55,6 +55,13 @@ def test_expressedexact_regex_match(text):
 
 
 @pytest.mark.parametrize('text', [
+    'nutrition: both breast and ebm',
+])
+def test_bffeeding_regex_match(text):
+    assert BF_FEEDING.matches(text)
+
+
+@pytest.mark.parametrize('text', [
     'Breastfeeding frequency: every 2-2.5 hours one 3-4 hour interval at night',
     'pumping every 2-3 hours',
     'pumping every hour',
@@ -63,7 +70,6 @@ def test_expressedexact_regex_match(text):
     'Breastfeeding frequency:8x day',
     'Intake at breast: 2.5 oz',
     'breast feeding every 3-4 hours for 10 minutes per side',
-    'nutrition: both breast and ebm',
     'Problems with breastfeeding: yes',  # problems imply breastfeeding ongoing
 ])
 def test_bfexact_regex_match(text):
@@ -103,3 +109,11 @@ def test_not_pumpactive_regex_match(text):
 ])
 def test_not_bfno_regex_match(text):
     assert not BF_NO_EXACT.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'discussed: nutrition: both breast and ebm',
+    'teaching/guidance:\nwhat?\nnutrition: both breast and ebm',
+])
+def test_not_bffeeding_regex_match(text):
+    assert not BF_FEEDING.matches(text)
