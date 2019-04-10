@@ -272,8 +272,17 @@ class Document:
         self.sentences = Sentences(self.new_text, self.matches)
 
     def _clean_text(self, text):
-        pat = re.compile(r'(Breastfeeding)\?\n((?:yes|no)\w*)', re.I)
-        return pat.sub(r'\1: \2', text)
+        """
+        These algorithms work on a sentence by sentence level, so occasionally need
+            to clean up where the sentence boundaries are.
+        :param text:
+        :return:
+        """
+        # spacy turns 'breastfeeding? yes' into two separate lines; undo that
+        text = re.sub(r'(Breastfeeding)\?\n((?:yes|no)\w*)', r'\1: \2', text, flags=re.I)
+        #
+        text = re.sub(r': *\n', r': ', text, flags=re.I)
+        return text
 
     def remove_patterns(self, *pats, ignore_negation=False):
         text = self.text

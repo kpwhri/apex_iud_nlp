@@ -1,7 +1,7 @@
 import pytest
 
 from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES, \
-    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING
+    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING, WHOLE_MILK
 
 
 @pytest.mark.parametrize('text', [
@@ -59,6 +59,21 @@ def test_expressedexact_regex_match(text):
 ])
 def test_bffeeding_regex_match(text):
     assert BF_FEEDING.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'Nutrition:  solids and formula and whole milk',
+])
+def test_wholemilk_regex_match(text):
+    assert WHOLE_MILK.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'Water: public water supply Nutrition: whole milk And still breast feeding',
+    'Nutrition:  solids and breast and whole milk'
+])
+def test_not_wholemilk_regex_match(text):
+    assert not WHOLE_MILK.matches(text)
 
 
 @pytest.mark.parametrize('text', [

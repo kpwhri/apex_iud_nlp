@@ -86,7 +86,7 @@ BF_FEEDING = Pattern(
     r'feeding: breast'
     r'|nutrition: (both|continue to|from)? breast'
     r')',
-    negates=['Teaching/Guidance:', 'Discussed:']
+    negates=['Teaching/Guidance:', 'Discussed:', 'provided:']
 )
 BF_EXACT = Pattern(
     r'(breast feeding(:|\?) y'
@@ -133,6 +133,11 @@ BF_STOP_BAD = Pattern(r'('
                       r'|resumed'
                       r'|bottle'
                       r')')
+# whole milk, no breast
+WHOLE_MILK = Pattern(r'('
+                     r'nutrition: (\w+ ){0,4}((cow s|whole) milk|formula)'
+                     r')',
+                     negates=[r'\bwean\b', 'breast', 'Teaching/Guidance:', 'Discussed:', 'provided:'])
 AGO = Pattern(r'\bago\b')
 
 
@@ -179,7 +184,7 @@ def determine_breastfeeding(document: Document, expected=None):
         if section.has_patterns(BF_EXACT, BF_DURATION, BF_TYPE, BF_YES, BF_FEEDING):
             yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
             found_bf = True
-        if section.has_patterns(BF_NO_EXACT):
+        if section.has_patterns(BF_NO_EXACT, WHOLE_MILK):
             yield my_result(BreastfeedingStatus.NO, text=section.text)
             found_bf = True
         if section.has_patterns(EXPRESSED_MILK_EXACT):
