@@ -288,7 +288,10 @@ class Document:
         text = self.text
         for pat in pats:
             text = pat.sub('', text)
-        return Document(self.name, text=text)
+        if text:
+            return Document(self.name, text=text)
+        else:
+            return None
 
     def has_pattern(self, pat, ignore_negation=False, by_sentence=True):
         """

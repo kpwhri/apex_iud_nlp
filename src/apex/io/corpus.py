@@ -23,12 +23,14 @@ def get_next_from_directory(directory, directories, version, filenames=None,
                     except FileNotFoundError:
                         continue
                     else:
-                        yield file.split('.')[0], None, text
+                        yield '.'.join(file.split('.')[:-1]), None, text
             else:
                 for entry in os.scandir(corpus_dir):
-                    doc_name = entry.name.split('.')[0]
+                    doc_name = '.'.join(entry.name.split('.')[:-1])
                     with open(entry.path, encoding=encoding) as fh:
                         text = fh.read()
+                    if not text:
+                        continue
                     yield doc_name, None, text
 
 

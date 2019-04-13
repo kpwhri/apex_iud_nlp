@@ -171,6 +171,8 @@ def determine_breastfeeding(document: Document, expected=None):
     my_result = partial(Result, expected=expected)
     has_boilerplate = False
     document = document.remove_patterns(BF_BOILERPLATE_SECTION)
+    if not document:  # only boilerplate
+        return
     if document.has_patterns(BF_BOILERPLATE_EXCLUDE, BF_UNKNOWN):
         return
     if document.has_patterns(BF_BOILERPLATE):
