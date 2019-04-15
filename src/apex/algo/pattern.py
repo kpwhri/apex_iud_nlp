@@ -124,7 +124,7 @@ class Sentences:
     def has_pattern(self, pat, ignore_negation=False):
         for sentence in self.sentences:
             if sentence.has_pattern(pat, ignore_negation=ignore_negation):
-                return True
+                return sentence.text
         return False
 
     def has_patterns(self, *pats, has_all=False, ignore_negation=False):

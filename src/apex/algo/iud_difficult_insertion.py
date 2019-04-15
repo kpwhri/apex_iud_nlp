@@ -30,9 +30,9 @@ PROVIDER = Pattern(r'('
                    r')',
                    negates=[negation, other, difficult, 'schedule', 'sleeping', 'risk',
                             'alternative', 'pregnancy', 'remov(al|ed)',
-                            r'visualiz\w+'])
+                            r'visualiz\w+', 'in place of', 'cipro', 'swallow'])
 
-NOT_IUD_INSERTION = Pattern(r'(implanon (was )?(placed|inserted)|'
+NOT_IUD_INSERTION = Pattern(r'((implanon|novasure( array)?) (was )?(placed|inserted)|'
                             f'{IUD} removal'
                             r')')
 CANNOT_PLACE = Pattern(
@@ -106,16 +106,17 @@ def determine_difficult_insertion(document: Document):
     """
     if document.has_patterns(NOT_IUD_INSERTION):
         yield DiffInsStatus.SKIP, None
-    if document.has_patterns(CANNOT_PLACE):
-        yield DiffInsStatus.UNSUCCESSFUL, document.text
     elif document.has_patterns(IUD, ignore_negation=True):
+        sent = document.get_pattern(CANNOT_PLACE)
+        if sent:
+            yield DiffInsStatus.UNSUCCESSFUL, sent
         if document.has_patterns(INSERTION, ignore_negation=True):
-            if document.has_patterns(UNSUCCESSFUL_INSERTION, INSERTION, has_all=True):
-                yield DiffInsStatus.UNSUCCESSFUL, document.text
-            if document.has_patterns(SUCCESSFUL_INSERTION, INSERTION, has_all=True):
-                yield DiffInsStatus.SUCCESSFUL, document.text
             found = False
             for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
+                if section.has_patterns(UNSUCCESSFUL_INSERTION, has_all=True):
+                    yield DiffInsStatus.UNSUCCESSFUL, section.text
+                if section.has_patterns(SUCCESSFUL_INSERTION, has_all=True):
+                    yield DiffInsStatus.SUCCESSFUL, section.text
                 if section.has_patterns(EASY_INSERTION):
                     yield DiffInsStatus.NOT_DIFFICULT, section.text
                     continue
