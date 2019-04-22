@@ -49,7 +49,7 @@ UNSUCCESSFUL_INSERTION = Pattern(r'(unsuccessful'
                                  r')',
                                  negates=[possible, hypothetical, historical, 'string', 'speculum',
                                           'brush', 'forcep', 'clamp', r'remov\w+', 'scope', 'needle',
-                                          'gauge', past, 'aspiration', 'essure'])
+                                          'gauge', past, 'aspiration', 'essure', 'risk', 'cancel'])
 SUCCESSFUL_INSERTION = Pattern(r'('
                                r'(trim|cut|clip|snip)\w* (the )?(stri?ng|thread)'
                                r'|(stri?ng|thread)s? ((was|were) )?(trim|cut|clip|snip)'
@@ -95,7 +95,7 @@ class DiffInsStatus(Status):
 def confirm_difficult_insertion(document: Document, expected=None):
     for status, text in determine_difficult_insertion(document):
         logging.debug(f'{status}: {text}')
-        if status.value in [1, 2, 3, 4, 5, 6]:
+        if status.value in [1, 2, 3, 4, 5, 6, 7, 8]:
             yield Result(status, status.value, expected, text)
 
 
@@ -107,6 +107,9 @@ def determine_difficult_insertion(document: Document):
     if document.has_patterns(NOT_IUD_INSERTION):
         yield DiffInsStatus.SKIP, None
     elif document.has_patterns(IUD, ignore_negation=True):
+        sent = document.get_pattern(SUCCESSFUL_INSERTION)
+        if sent:
+            yield DiffInsStatus.SUCCESSFUL, sent
         sent = document.get_pattern(CANNOT_PLACE)
         if sent:
             yield DiffInsStatus.UNSUCCESSFUL, sent
@@ -115,8 +118,6 @@ def determine_difficult_insertion(document: Document):
             for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
                 if section.has_patterns(UNSUCCESSFUL_INSERTION, has_all=True):
                     yield DiffInsStatus.UNSUCCESSFUL, section.text
-                if section.has_patterns(SUCCESSFUL_INSERTION, has_all=True):
-                    yield DiffInsStatus.SUCCESSFUL, section.text
                 if section.has_patterns(EASY_INSERTION):
                     yield DiffInsStatus.NOT_DIFFICULT, section.text
                     continue
