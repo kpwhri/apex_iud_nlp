@@ -1,7 +1,7 @@
 import pytest
 
 from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES, \
-    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING, WHOLE_MILK
+    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING, WHOLE_MILK, matches_nutrition_not_bf
 
 
 @pytest.mark.parametrize('text', [
@@ -146,3 +146,18 @@ def test_not_bfno_regex_match(text):
 ])
 def test_not_bffeeding_regex_match(text):
     assert not BF_FEEDING.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'nutrition: formula - similac, sometimes gets pedialite',
+])
+def test_matches_nutrition_not_bf(text):
+    assert matches_nutrition_not_bf(text)
+
+
+@pytest.mark.parametrize('text', [
+    'nutrition: weaning from bottle',
+    'Information provided: nutrition: breastfeeding',
+])
+def test_not_matches_nutrition_not_bf(text):
+    assert not matches_nutrition_not_bf(text)

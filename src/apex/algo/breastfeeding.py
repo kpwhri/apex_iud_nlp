@@ -88,6 +88,15 @@ BF_FEEDING = Pattern(
     r')',
     negates=['Teaching/Guidance:', 'Discussed:', 'provided:']
 )
+BF_FEEDING_CPT = Pattern(r'(?:feeding|nutrition): ([^:]*)',
+                         negates=[r'\btry\b', r'\bdo\b', r'\byou\b', 'serve', 'pregnancy',
+                                  'typical daily', 'patient', r'meals\W*standard',
+                                  'evaluat', 'test', 'exam',
+                                  'Teaching/Guidance:', 'Discussed:', 'provided:', 'exercise'])
+POSS_BF = Pattern(r'(breast|bf|wean|nurs|pump|express)')
+ALT_TO_BF = Pattern(r'\b(formula|whole|milk|soy|bottle|similac|costco|safeway|brand|gerber'
+                    r'|enfamil|good|poor|solid|organic|lactaid|balance|diet|eat|cereal|cow'
+                    r'|veggies|fruits|rice|cooked)')
 BF_EXACT = Pattern(
     r'(breast feeding(:|\?) y'
     r'|breastfeeding: offered: y'
@@ -145,7 +154,8 @@ BF_STOP_BAD = Pattern(r'('
 WHOLE_MILK = Pattern(r'('
                      r'nutrition: (\w+ ){0,4}((cow s|whole) milk|formula)'
                      r')',
-                     negates=[r'\bwean\b', 'breast', 'Teaching/Guidance:', 'Discussed:', 'provided:'])
+                     negates=[r'\bwean\b', 'breast', r'\btry\b', r'\bserve\b', r'\byou\b', 'patient',
+                              'Teaching/Guidance:', 'Discussed:', 'provided:', r'meals\W*standard'])
 AGO = Pattern(r'\bago\b')
 
 
@@ -166,13 +176,25 @@ class BreastfeedingStatus(Status):
     NO_FORMULA = 12
     STOP = 13
     STOPPED_BEFORE = 14  # stopped well before this date (age of child as reference)
+    OTHER_NUTRITION = 15
     SKIP = 99
 
 
 def confirm_breastfeeding(document: Document, expected=None):
     for res in determine_breastfeeding(document, expected=expected):
-        if res.result in [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14]:
+        if res.result in [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 15]:
             yield res
+
+
+def matches_nutrition_not_bf(text):
+    m = BF_FEEDING_CPT.matches(text)
+    if m:
+        text = m.group(1).strip()
+        if not POSS_BF.matches(text) and ALT_TO_BF.matches(text):
+            # no possible language about bf
+            # and suggests some alternative (formula, whole milk, solids, etc.)
+            return True
+    return False
 
 
 def determine_breastfeeding(document: Document, expected=None):
@@ -220,8 +242,13 @@ def determine_breastfeeding(document: Document, expected=None):
         if section.has_patterns(LATCHING):
             yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
             found_bf = True
-        # boilerplate: there is at least some template language
+
+        # look for presence of "nutrition:" or "feeding:" followed by not info about breast
+        if matches_nutrition_not_bf(section.text):
+            yield my_result(BreastfeedingStatus.OTHER_NUTRITION, text=section.text)
+            found_bf = True
         if not found_bf and not has_boilerplate:
+            # boilerplate: there is at least some template language
             # only non-boilerplate
             if section.has_patterns(NIPPLE_SHIELD, BF_SUPPLEMENT):
                 yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
