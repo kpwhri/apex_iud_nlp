@@ -17,6 +17,8 @@ def test_lactationvisit_regex_match(text):
     'breastfeeding exclusively',
     'exclusively breastfeeding',
     'currently breastfeeding',
+    'she is currently breast feeding',
+    'she is breast feeding',
 ])
 def test_yes_regex_match(text):
     assert BF_YES.matches(text)
@@ -120,7 +122,19 @@ def test_not_pumpactive_regex_match(text):
 
 
 @pytest.mark.parametrize('text', [
+    'breastfeeding: No    Tobacco Use: quit',
+    'breastfeeding: None    Tobacco Use: quit',
+    'breastfeeding: N    Tobacco Use: quit',
+    'breastfeeding: denies    Tobacco Use: quit',
+])
+def test_bfno_regex_match(text):
+    assert BF_NO_EXACT.matches(text)
+
+
+@pytest.mark.parametrize('text', [
     'Problems with breastfeeding: no',
+    'breastfeeding: NA    Tobacco Use: quit',
+    'breastfeeding: N/A    Tobacco Use: quit',
 ])
 def test_not_bfno_regex_match(text):
     assert not BF_NO_EXACT.matches(text)

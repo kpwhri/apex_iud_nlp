@@ -96,10 +96,15 @@ BF_EXACT = Pattern(
     r' (x|times){0,2} \d{0,2} [hmd]'
     r'|pumping every (\d{1,2}(.\d{1,2})? (\d{1,2}(.\d{1,2})?)?)? [hm]'
     r'|intake at breast: [\d/\-\.\s]+ (ml|g|oz|ounce)'
+    r'|breast feeding and (bottle feeding|supplementing|doing well)'
+    r'|breastfeeding issues: (yes|no problems)'
     r')'
 )
-BF_NO_EXACT = Pattern(r'(breast feeding: no|breastfeeding: offered: no)',
+BF_NO_EXACT = Pattern(r'(breast feeding|breastfeeding: offered): (n[o\s]|denies)',
                       negates=['previous', 'history', 'hx', 'problems'])
+BF_NOT = Pattern(r'('
+                 r'(pt|is|been) not ((currently|now|presently) )?(breast feeding|\bbf\b)'
+                 r')')
 BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?(very )?well'
                  r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b)'
                  r'|breast feeding without difficulty'
@@ -121,7 +126,10 @@ PUMPING = Pattern(r'(breast pump)',
 BOTTLE_EXACT = Pattern(r'(taking bottle: y|method: bottle)')
 BF_SUPPLEMENT = Pattern(r'supplement breast feeding',
                         negates=[negation, hypothetical, historical, boilerplate])
-BF_STOP = Pattern(r'(stop\w+|no longer|quit) (breast feeding|nursing)',
+BF_STOP = Pattern(r'('
+                  r'(stop\w+|no longer|quit) (breast feeding|nursing)'
+                  r'|just stopped breast feeding'
+                  r')',
                   negates=[negation, hypothetical, historical, boilerplate,
                            'for a few days', 'had', 'on that side', 'cause', 'conflicted',
                            'thinking', 'planning', 'since', 'start', 'process'])
@@ -163,7 +171,7 @@ class BreastfeedingStatus(Status):
 
 def confirm_breastfeeding(document: Document, expected=None):
     for res in determine_breastfeeding(document, expected=expected):
-        if res.result in [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13]:
+        if res.result in [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14]:
             yield res
 
 
