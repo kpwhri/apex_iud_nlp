@@ -1,7 +1,7 @@
 import pytest
 
 from apex.algo.breastfeeding import LACTATION_VISIT, BF_UNKNOWN, BF_EXACT, BF_NO_EXACT, EXPRESSED_MILK_EXACT, BF_YES, \
-    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING, WHOLE_MILK, matches_nutrition_not_bf
+    PUMPING_ACTIVE, NIPPLE_SHIELD, BF_FEEDING, WHOLE_MILK, matches_nutrition_not_bf, BF_NOT
 
 
 @pytest.mark.parametrize('text', [
@@ -58,6 +58,8 @@ def test_expressedexact_regex_match(text):
 
 @pytest.mark.parametrize('text', [
     'nutrition: both breast and ebm',
+    'he takes both breast and formula',
+    'she is taking breast only',
 ])
 def test_bffeeding_regex_match(text):
     assert BF_FEEDING.matches(text)
@@ -94,8 +96,15 @@ def test_bfexact_regex_match(text):
     assert not BF_NO_EXACT.matches(text)
 
 
-# NOT
+@pytest.mark.parametrize('text', [
+    'She is not breast feeding',
+    'pt is not breastfeeding',
+])
+def test_bfnot_match(text):
+    assert BF_NOT.matches(text)
 
+
+# NOT
 @pytest.mark.parametrize('text', [
     'prelactation consultation',
     'The lactation consultant usually advises waiting 4-5 days between offering new foods',
