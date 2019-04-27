@@ -150,6 +150,7 @@ def test_not_bffeeding_regex_match(text):
 
 @pytest.mark.parametrize('text', [
     'nutrition: formula - similac, sometimes gets pedialite',
+    'Nutrition: Bottle Frequency: 2 ounces 4 times per day.',
 ])
 def test_matches_nutrition_not_bf(text):
     assert matches_nutrition_not_bf(text)
@@ -158,6 +159,7 @@ def test_matches_nutrition_not_bf(text):
 @pytest.mark.parametrize('text', [
     'nutrition: weaning from bottle',
     'Information provided: nutrition: breastfeeding',
+    'Nutrition: Br Frequency: 2 ounces 4 times per day.',
 ])
 def test_not_matches_nutrition_not_bf(text):
     assert not matches_nutrition_not_bf(text)

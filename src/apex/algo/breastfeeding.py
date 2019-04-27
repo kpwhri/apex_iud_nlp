@@ -84,7 +84,7 @@ BF_HISTORY = Pattern(r'(breastfeeding history: y)')
 BF_FEEDING = Pattern(
     r'('
     r'feeding: breast'
-    r'|nutrition: (both|continue to|from)? breast'
+    r'|nutrition: ((both|continue to|from) )?breast'
     r')',
     negates=['Teaching/Guidance:', 'Discussed:', 'provided:']
 )
@@ -93,7 +93,7 @@ BF_FEEDING_CPT = Pattern(r'(?:feeding|nutrition): ([^:]*)',
                                   'typical daily', 'patient', r'meals\W*standard',
                                   'evaluat', 'test', 'exam',
                                   'Teaching/Guidance:', 'Discussed:', 'provided:', 'exercise'])
-POSS_BF = Pattern(r'(breast|bf|wean|nurs|pump|express)')
+POSS_BF = Pattern(r'(breast|bf|\bbr\b|wean|nurs|pump|express)')
 ALT_TO_BF = Pattern(r'\b(formula|whole|milk|soy|bottle|similac|costco|safeway|brand|gerber'
                     r'|enfamil|good|poor|solid|organic|lactaid|balance|diet|eat|cereal|cow'
                     r'|veggies|fruits|rice|cooked)')
@@ -109,7 +109,11 @@ BF_EXACT = Pattern(
     r'|breastfeeding issues: (yes|no problems)'
     r')'
 )
-BF_NO_EXACT = Pattern(r'(breast feeding|breastfeeding: offered): (n[o\s]|denies)',
+BF_NO_EXACT = Pattern(r'('
+                      r'(breast feeding|breastfeeding: offered): (n[o\s]|denies)'
+                      r'|lactating: (n[o\s]|denies)'
+                      r'|tak(es|ing) (bottle|formula) only'
+                      r')',
                       negates=['previous', 'history', 'hx', 'problems'])
 BF_NOT = Pattern(r'('
                  r'(pt|is|been) not ((currently|now|presently) )?(breast feeding|\bbf\b)'
@@ -118,6 +122,8 @@ BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?(very )?well'
                  r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b)'
                  r'|breast feeding without difficulty'
                  r'|still (\bbf\b|breast feeding|nurses)'
+                 r'|feeding (fairly )?(well|good|fine|ok(ay)?) at the breast'
+                 r'|breast feeding ((has gone|is going) )?(fairly )?(well|good|fine|ok(ay)?)'
                  r'|continues to breast feed'
                  r'|(exclusive|current)ly breast feeding'
                  r'|breast feeding exclusively'
