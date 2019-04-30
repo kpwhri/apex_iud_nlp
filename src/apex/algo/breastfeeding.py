@@ -22,7 +22,7 @@ EXPRESSED_MILK = Pattern(r'(express\w+( breast)? milk)',
                          negates=[negation, hypothetical, historical, boilerplate])
 EXPRESSED_MILK_EXACT = Pattern(
     r'('
-    r'expressed breast milk: (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
+    r'expressed breast milk : (most|some|all|[\d/\-\.\s]+ (oz|ounce|g|ml)|yes)'
     r'|(oz|ounces?|g|ml) of expressed breast milk'
     r')'
 )
@@ -32,7 +32,7 @@ BF_DURATION = Pattern(r'(duration at breast|time breast feeding|total intake thi
 BF_TYPE = Pattern(r'((feeding methods?|type feeding|nourishment method) (both )?breast)')
 BF_UNKNOWN = Pattern(r'('
                      r'breast feeding (\*|na|yes/no/na|not applicable)'
-                     r'|breast feeding: YES NO'
+                     r'|breast feeding : YES NO'
                      r')')
 BF_BOILERPLATE_EXCLUDE = Pattern(r'('
                                  r'initial ob provider visit'
@@ -72,7 +72,7 @@ BF_BOILERPLATE = Pattern(r'(breastfeeding plan|most breastfeeding problems|use d
                          r'come to the hospital if'
                          r')')
 BF_BOILERPLATE_SECTION = Pattern(r'('
-                                 r'Bottle-Feeding: Promoting Healthy Growth and Development'
+                                 r'Bottle Feeding : Promoting Healthy Growth and Development'
                                  r'|practice deep latching techniques'
                                  r'|after your visit'
                                  r'|what to expect'
@@ -80,48 +80,48 @@ BF_BOILERPLATE_SECTION = Pattern(r'('
                                  r'|some suggestions'
                                  r'|things to start thinking about'
                                  r').*', flags=re.IGNORECASE | re.MULTILINE)
-BF_HISTORY = Pattern(r'(breastfeeding history: y)')
+BF_HISTORY = Pattern(r'(breastfeeding history : y)')
 BF_FEEDING = Pattern(
     r'('
-    r'feeding: breast'
-    r'|nutrition: ((both|continue to|from) )?breast'
+    r'feeding : breast'
+    r'|nutrition : ((both|continue to|from) )?breast'
     r'|s?he (is )?tak(es|ing) (both )? breast'
     r'|s?he is breast feeding'
     r')',
-    negates=['Teaching/Guidance:', 'Discussed:', 'provided:']
+    negates=[r'Teaching/Guidance\W*:', r'Discussed\W*:', r'provided\W*:']
 )
-BF_FEEDING_CPT = Pattern(r'(?:feeding|nutrition): ([^:]*)',
+BF_FEEDING_CPT = Pattern(r'(?:feeding|nutrition) : ([^:]*)',
                          negates=[r'\btry\b', r'\bdo\b', r'\byou\b', 'serve', 'pregnancy',
                                   'typical daily', 'patient', r'meals\W*standard',
                                   'evaluat', 'test', 'exam',
-                                  'Teaching/Guidance:', 'Discussed:', 'provided:', 'exercise'])
+                                  r'Teaching/Guidance\W*:', r'Discussed\W*:', r'provided\W*:', 'exercise'])
 POSS_BF = Pattern(r'(breast|bf|\bbr\b|wean|nurs|pump|express)')
 ALT_TO_BF = Pattern(r'\b(formula|whole|milk|soy|bottle|similac|costco|safeway|brand|gerber'
                     r'|enfamil|good|poor|solid|organic|lactaid|balance|diet|eat|cereal|cow'
                     r'|veggies|fruits|rice|cooked)')
 BF_EXACT = Pattern(
-    r'(breast feeding(:|\?) y'
-    r'|breastfeeding: offered: y'
-    r'|taking breast: (y|(for )\d)'
+    r'(breast feeding (:|\?) y'
+    r'|breastfeeding : offered : y'
+    r'|taking breast : (y|(for )\d)'
     r'|(breast\s?(feeding|milk)|nursing) (frequency )?(every )?\d{1,2}(\.\d{1,2})?(-\d{1,2}(\.\d{1,2})?)?'
     r' (x|times){0,2} \d{0,2} [hmd]'
     r'|pumping every (\d{1,2}(.\d{1,2})? (\d{1,2}(.\d{1,2})?)?)? [hm]'
-    r'|intake at breast: [\d/\-\.\s]+ (ml|g|oz|ounce)'
+    r'|intake at breast : [\d/\-\.\s]+ (ml|g|oz|ounce)'
     r'|breast feeding and (bottle feeding|supplementing|doing well)'
-    r'|breastfeeding issues: (yes|no problems)'
+    r'|breastfeeding issues : (yes|no problems)'
     r')'
 )
 BF_NO_EXACT = Pattern(r'('
-                      r'(breast feeding|breastfeeding: offered): (n[o\s]|denies)'
-                      r'|lactating: (n[o\s]|denies)'
+                      r'(breast feeding|breastfeeding : offered) : (n[o\s]|denies)'
+                      r'|lactating : (n[o\s]|denies)'
                       r'|tak(es|ing) (bottle|formula) only'
                       r')',
                       negates=['previous', 'history', 'hx', 'problems'])
 BF_NOT = Pattern(r'('
                  r'(pt|is|been) not ((currently|now|presently) )?(breast feeding|\bbf\b)'
                  r')')
-BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?(very )?well'
-                 r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b)'
+BF_YES = Pattern(r'((breast feeding|\bbf\b) ((has been|is) )?(going )?((very|pretty) )?well'
+                 r'|(pt|is|been) ((currently|now|presently|exclusively) )?(breast feeding|\bbf\b|nursing (him|her))'
                  r'|breast feeding without difficulty'
                  r'|still (\bbf\b|breast feeding|nurses)'
                  r'|feeding (fairly )?(well|good|fine|ok(ay)?) at the breast'
@@ -129,22 +129,23 @@ BF_YES = Pattern(r'((breast feeding|\bbf\b) (has been )?(going )?(very )?well'
                  r'|continues to breast feed'
                  r'|(exclusive|current)ly breast feeding'
                  r'|breast feeding exclusively'
+                 r'|congratulat\w+ on (\w+ )?persever[ae]nce with breast feeding'
                  r')',
                  negates=[negation, hypothetical, 'advise', 'some'])
 BF = Pattern(r'(feed\w+ breast|breast feeding|breast fed|\bbf\b)',
              negates=[negation, hypothetical, historical, boilerplate])
-FORMULA_EXACT = Pattern(r'(formula offered: y|formula: y)', space_replace=r'\s*')
-FORMULA_NO = Pattern(r'(formula: no)')
-PUMPING_EXACT = Pattern(r'(yes breast pump|problems with pumping: no)')
+FORMULA_EXACT = Pattern(r'(formula offered : y|formula : y)', space_replace=r'\s*')
+FORMULA_NO = Pattern(r'(formula : no)')
+PUMPING_EXACT = Pattern(r'(yes breast pump|problems with pumping : no)')
 PUMPING_ACTIVE = Pattern(r'(breast pumping|is using( a)? breast pump)',
                          negates=[negation, hypothetical, historical, possible])
 PUMPING = Pattern(r'(breast pump)',
                   negates=[negation, hypothetical, historical, boilerplate])
-BOTTLE_EXACT = Pattern(r'(taking bottle: y|method: bottle)')
+BOTTLE_EXACT = Pattern(r'(taking bottle : y|method : bottle)')
 BF_SUPPLEMENT = Pattern(r'supplement breast feeding',
                         negates=[negation, hypothetical, historical, boilerplate])
 BF_STOP = Pattern(r'('
-                  r'(stop\w+|no longer|quit) (breast feeding|nursing)'
+                  r'(stop\w+|no longer|quit) (breast feeding|nursing|\bbf\b)'
                   r'|just stopped breast feeding'
                   r')',
                   negates=[negation, hypothetical, historical, boilerplate,
@@ -160,10 +161,10 @@ BF_STOP_BAD = Pattern(r'('
                       r')')
 # whole milk, no breast
 WHOLE_MILK = Pattern(r'('
-                     r'nutrition: (\w+ ){0,4}((cow s|whole) milk|formula)'
+                     r'nutrition : (\w+ ){0,4}((cow s|whole) milk|formula)'
                      r')',
                      negates=[r'\bwean\b', 'breast', r'\btry\b', r'\bserve\b', r'\byou\b', 'patient',
-                              'Teaching/Guidance:', 'Discussed:', 'provided:', r'meals\W*standard'])
+                              r'Teaching/Guidance\W*:', r'Discussed\W*:', r'provided\W*:', r'meals\W*standard'])
 AGO = Pattern(r'\bago\b')
 
 
@@ -218,6 +219,10 @@ def determine_breastfeeding(document: Document, expected=None):
         has_boilerplate = True
     non_exact_count = 0
     non_exact_count_snippets = []
+    for sentence in document.sentences:
+        # look for presence of "nutrition:" or "feeding:" followed by not info about breast
+        if matches_nutrition_not_bf(sentence.text):
+            yield my_result(BreastfeedingStatus.OTHER_NUTRITION, text=sentence.text)
     for section in document.select_sentences_with_patterns(ANY_BREAST):
         found_bf = False
         # pre boilerplate patterns: exact/not confused with boilerplate
@@ -249,11 +254,6 @@ def determine_breastfeeding(document: Document, expected=None):
             found_bf = True
         if section.has_patterns(LATCHING):
             yield my_result(BreastfeedingStatus.BREASTFEEDING, text=section.text)
-            found_bf = True
-
-        # look for presence of "nutrition:" or "feeding:" followed by not info about breast
-        if matches_nutrition_not_bf(section.text):
-            yield my_result(BreastfeedingStatus.OTHER_NUTRITION, text=section.text)
             found_bf = True
         if not found_bf and not has_boilerplate:
             # boilerplate: there is at least some template language
