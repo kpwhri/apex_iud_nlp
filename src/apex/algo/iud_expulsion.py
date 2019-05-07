@@ -35,9 +35,9 @@ PARTIAL_EXP = Pattern(r'(partial\w* exp[eu]l'
                       f'({LOWER_UTERINE}( and)?'
                       r' (the )?(\w+\s+){,4})?'
                       f' {CX_OS}'
-                      f'|protrud\\w+ from (the )?{CX_OS}'
+                      f'|(pro|ex)trud\\w+ from (the )?{CX_OS}'
                       r')',
-                      negates=[misc_excl, negation, 'string', 'polyp', boilerplate])
+                      negates=[misc_excl, negation, 'strings?', 'polyp', boilerplate])
 VISUALIZED = Pattern(f'(({IUD})( was)? {NOTED})',
                      negates=[misc_excl, negation, hypothetical, boilerplate])
 MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|find|locat))',
@@ -66,6 +66,7 @@ class ExpulsionStatus(Status):
     DISPLACEMENT = 7
     POSSIBLE = 8
     POSS_DISPLACEMENT = 9
+    PROPER_PLACEMENT = 10
     HISTORY = 98
     SKIP = 99
 
