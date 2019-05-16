@@ -12,6 +12,23 @@ INSIDE = r'(within|inside|in)'
 CX = r'(\bcx\b|cervical|cervix)'
 CX_OS = f'({CX}|os)'
 
+PROPER_LOCATION = Pattern(
+    rf'('
+    rf'in( a)? (expected|proper|appropriate|satisfactory|normal|regular|good|correct) (location|position|place)'
+    rf'|(expected|proper|appropriate|satisfactori|normal|correct)ly (locat|position|plac)\w+'
+    rf'|(present|locat\w+|position\w*|visuali[sz]ed|seen) (with)?in the (uter\w+|endometri\w+)'
+    rf'|{IUD}\s*((is|was) )?in (place|situ)'
+    rf')',
+    negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
+             'strings?', 'especially', 'negative', 'plan', r'cervi\w+']
+)
+IN_UTERUS = Pattern(
+    rf'('
+    rf'(with)?in the (uter\w+|endometri\w+)'
+    rf')',
+    negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
+             'strings?', 'especially', 'negative', 'plan', r'cervi\w+']
+)
 PREVIOUS = Pattern(r'(previous|history|\bprior\b|\blast\b)',
                    negates=[r'\bago\b', r'\brecent'])
 INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|badly|\bmal\b)',
@@ -67,6 +84,7 @@ class ExpulsionStatus(Status):
     POSSIBLE = 8
     POSS_DISPLACEMENT = 9
     PROPER_PLACEMENT = 10
+    IN_UTERUS = 11
     HISTORY = 98
     SKIP = 99
 
@@ -91,5 +109,9 @@ def determine_iud_expulsion(document: Document):
                 yield ExpulsionStatus.PARTIAL, history, section.text
             if section.has_patterns(MISSING, STRINGS, has_all=True):
                 yield ExpulsionStatus.MISSING_STRING, history, section.text
+            if section.has_patterns(PROPER_LOCATION):
+                yield ExpulsionStatus.PROPER_PLACEMENT, history, section.text
+            if section.has_patterns(IN_UTERUS):
+                yield ExpulsionStatus.IN_UTERUS, history, section.text
     else:
         yield ExpulsionStatus.SKIP, None, document.text

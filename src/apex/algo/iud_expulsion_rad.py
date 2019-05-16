@@ -1,6 +1,7 @@
 import re
 
-from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, misc_excl, LOWER_UTERINE, NOTED, INSIDE
+from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, misc_excl, LOWER_UTERINE, NOTED, INSIDE, \
+    PROPER_LOCATION, IN_UTERUS
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result
 from apex.algo.shared import IUD, negation, boilerplate
@@ -48,6 +49,12 @@ def determine_iud_expulsion_rad(document: Document):
         if impression.has_patterns(MALPOSITION, MALPOSITION_IUD):
             found = True
             yield ExpulsionStatus.MALPOSITION, impression.text
+        if impression.has_patterns(PROPER_LOCATION):
+            found = True
+            yield ExpulsionStatus.PROPER_PLACEMENT, impression.text
+        if impression.has_patterns(IN_UTERUS):
+            found = False  # don't count this one
+            yield ExpulsionStatus.IN_UTERUS, impression.text
     if found:
         return
     elif start_section.has_patterns(IUD, IUD_PRESENT, has_all=True) or \

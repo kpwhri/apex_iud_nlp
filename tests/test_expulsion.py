@@ -1,6 +1,7 @@
 import pytest
 
-from apex.algo.iud_expulsion import PARTIAL_EXP, MISSING, STRINGS, DISPLACEMENT, INCORRECT, PLACEMENT, PREVIOUS
+from apex.algo.iud_expulsion import PARTIAL_EXP, MISSING, STRINGS, DISPLACEMENT, INCORRECT, PLACEMENT, PREVIOUS, \
+    PROPER_LOCATION
 from apex.algo.iud_expulsion_rad import MALPOSITION, NOT_SEEN_IUD, IUD_NOT_SEEN, IUD_PRESENT, STRING, VISIBLE
 from apex.algo.shared import IUD
 
@@ -91,6 +92,37 @@ def test_stringsearch_regex_match(text):
 def test_stringsmissing_regex_match(text):
     """Confirm proper hst/sas"""
     assert MISSING.matches(text) and STRINGS.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'iud is in expected position',
+    'IUD appears to be in appropriate position within a retroverted uterus',
+    'mirena iud in place',
+    'An IUD is in appropriate position within the uterus',
+    'appears appropriately positioned',
+    'is appropriately positioned',
+    'IUD in appropriate position',
+    'IUD is visualized within the endometrial cavity',
+    'IUD present in the uterus',
+    'iud was in good position',
+    'iud appears properly positioned in the uterus',
+    'IUD located in the uterus'
+])
+def test_proper_location_match(text):
+    assert PROPER_LOCATION.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'iud is not in expected position',
+    'Reviewed risks of IUD placement',
+    'confirm proper placement of iud',
+    'recent IUD placement who presents',
+    'iud is out of place',
+    'Difficult to determine if the IUD is within the endometrial cavity',
+    'the option of leaving it in place for longer than 5 years',
+])
+def test_not_proper_location_match(text):
+    assert not PROPER_LOCATION.matches(text)
 
 
 # NOT
