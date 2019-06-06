@@ -1,12 +1,12 @@
 import re
 
 from apex.algo.iud_expulsion import ExpulsionStatus, PARTIAL_EXP, misc_excl, LOWER_UTERINE, NOTED, INSIDE, \
-    PROPER_LOCATION, IN_UTERUS
+    PROPER_LOCATION, IN_UTERUS, LOWER_UTERINE_SEGMENT
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Result
 from apex.algo.shared import IUD, negation, boilerplate
 
-SECTIONS = re.compile(r'([A-Z]+( [A-Z]+)?|Impression|Transvaginal|Transabdominal'
+SECTIONS = re.compile(r'([A-Z]+( [A-Z]+)?|Impression|Imp|Transvaginal|Transabdominal'
                       r'|Findings|Examination|History)\W*?:')
 IUD_PRESENT = Pattern(f'({NOTED}|absent)')
 STRING = Pattern(r'string')
@@ -36,7 +36,7 @@ def determine_iud_expulsion_rad(document: Document):
     sections = document.split(SECTIONS)
     start_section = sections.get_sections('HST', 'SAS', 'HISTORY',
                                           'CLINICAL INFORMATION', 'CLINICAL HISTORY AND QUESTION')
-    impression = sections.get_sections('IMPRESSION', 'IMPRESSIONS')
+    impression = sections.get_sections('IMPRESSION', 'IMPRESSIONS', 'IMP')
     other = sections.get_sections('FINDINGS', 'TRANSVAGINAL', 'FINDING')
     found = False
     if impression:
@@ -55,6 +55,8 @@ def determine_iud_expulsion_rad(document: Document):
         if impression.has_patterns(IN_UTERUS):
             found = False  # don't count this one
             yield ExpulsionStatus.IN_UTERUS, impression.text
+        if impression.has_patterns(LOWER_UTERINE_SEGMENT):
+            yield ExpulsionStatus.LOWER_UTERINE_SEGMENT, impression.text
     if found:
         return
     elif start_section.has_patterns(IUD, IUD_PRESENT, has_all=True) or \

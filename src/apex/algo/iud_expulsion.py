@@ -22,6 +22,9 @@ PROPER_LOCATION = Pattern(
     negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
              'strings?', 'especially', 'negative', 'plan', r'cervi\w+']
 )
+LOWER_UTERINE_SEGMENT = Pattern(r'(lower uterine segment|low lying|\blus\b)',
+                                negates=[negation, 'strings?', 'negative',
+                                         r'\b(confirm|check|difficult|determine|if\b|option|talk)'])
 IN_UTERUS = Pattern(
     rf'('
     rf'(with)?in the (uter\w+|endometri\w+)'
@@ -85,6 +88,7 @@ class ExpulsionStatus(Status):
     POSS_DISPLACEMENT = 9
     PROPER_PLACEMENT = 10
     IN_UTERUS = 11
+    LOWER_UTERINE_SEGMENT = 12
     HISTORY = 98
     SKIP = 99
 
@@ -103,6 +107,8 @@ def determine_iud_expulsion(document: Document):
                     section.has_patterns(DISPLACEMENT):
                 if not section.has_patterns(IN_CERVIX):
                     yield ExpulsionStatus.MALPOSITION, history, section.text
+            if section.has_patterns(LOWER_UTERINE_SEGMENT):
+                yield ExpulsionStatus.LOWER_UTERINE_SEGMENT, history, section.text
             if section.has_patterns(COMPLETE):
                 yield ExpulsionStatus.EXPULSION, history, section.text
             if section.has_patterns(PARTIAL_EXP):
