@@ -56,15 +56,22 @@ def determine_iud_expulsion_rad(document: Document):
             found = False  # don't count this one
             yield ExpulsionStatus.IN_UTERUS, impression.text
         if impression.has_patterns(LOWER_UTERINE_SEGMENT):
+            found = False
             yield ExpulsionStatus.LOWER_UTERINE_SEGMENT, impression.text
     if found:
         return
     elif start_section.has_patterns(IUD, IUD_PRESENT, has_all=True) or \
             start_section.has_patterns(STRING, VISIBLE, has_all=True):
         if other.has_patterns(PARTIAL_EXP):
-            yield ExpulsionStatus.PARTIAL, impression.text
+            yield ExpulsionStatus.PARTIAL, other.text
         if other.has_patterns(MALPOSITION, MALPOSITION_IUD):
-            yield ExpulsionStatus.MALPOSITION, impression.text
+            yield ExpulsionStatus.MALPOSITION, other.text
+        if other.has_patterns(PROPER_LOCATION):
+            yield ExpulsionStatus.PROPER_PLACEMENT, other.text
+        if other.has_patterns(IN_UTERUS):
+            yield ExpulsionStatus.IN_UTERUS, other.text
+        if other.has_patterns(LOWER_UTERINE_SEGMENT):
+            yield ExpulsionStatus.LOWER_UTERINE_SEGMENT, other.text
     else:
         sentences = list(document.select_sentences_with_patterns(IUD))
         if sentences:
@@ -73,5 +80,11 @@ def determine_iud_expulsion_rad(document: Document):
                     yield ExpulsionStatus.PARTIAL, sentence.text
                 if sentence.has_patterns(MALPOSITION, MALPOSITION_IUD):
                     yield ExpulsionStatus.MALPOSITION, sentence.text
+                if sentence.has_patterns(PROPER_LOCATION):
+                    yield ExpulsionStatus.PROPER_PLACEMENT, sentence.text
+                if sentence.has_patterns(IN_UTERUS):
+                    yield ExpulsionStatus.IN_UTERUS, sentence.text
+                if sentence.has_patterns(LOWER_UTERINE_SEGMENT):
+                    yield ExpulsionStatus.LOWER_UTERINE_SEGMENT, sentence.text
         else:
             yield ExpulsionStatus.SKIP, None
