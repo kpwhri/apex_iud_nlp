@@ -9,7 +9,7 @@ UTERINE = r'(uter(ine|us))'
 LOWER_UTERINE = f'((lower|inferior) (({UTERINE}|segment|body) )+)'
 NOTED = r'((see|visible|found|in place|visualiz|note|locate|position|present|identif)\w*)'
 INSIDE = r'(within|inside|in)'
-CX = r'(\bcx\b|cervical|cervix)'
+CX = r'(\bcx\b|cervical|cervix|\bcerv\b)'
 CX_OS = f'({CX}|os)'
 
 PROPER_LOCATION = Pattern(
