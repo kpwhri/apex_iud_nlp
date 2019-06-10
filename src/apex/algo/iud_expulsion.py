@@ -17,18 +17,19 @@ PROPER_LOCATION = Pattern(
     rf'in( a)? (expected|proper|appropriate|satisfactory|normal|regular|good|correct) (location|position|place)'
     rf'|(expected|proper|appropriate|satisfactori|normal|correct)ly (locat|position|plac)\w+'
     rf'|(present|locat\w+|position\w*|visuali[sz]ed|seen) (with)?in the (uter\w+|endometri\w+)'
-    rf'|{IUD}\s*((is|was) )?in (place|situ)'
     rf')',
     negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
              'strings?', 'especially', 'negative', 'plan', r'cervi\w+',
              'affirmative']
 )
+
 LOWER_UTERINE_SEGMENT = Pattern(r'(lower uter\w+|low position|low lying|\blus\b)',
                                 negates=[negation, 'strings?', 'negative',
                                          r'\b(confirm|check|difficult|determine|if\b|option|talk)'])
 IN_UTERUS = Pattern(
     rf'('
     rf'(with)?in the (uter\w+|endometri\w+)'
+    rf'|{IUD}\s*((is|was) )?in (place|situ)'
     rf')',
     negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
              'strings?', 'especially', 'negative', 'plan', r'cervi\w+']
