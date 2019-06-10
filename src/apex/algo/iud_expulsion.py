@@ -20,9 +20,10 @@ PROPER_LOCATION = Pattern(
     rf'|{IUD}\s*((is|was) )?in (place|situ)'
     rf')',
     negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
-             'strings?', 'especially', 'negative', 'plan', r'cervi\w+']
+             'strings?', 'especially', 'negative', 'plan', r'cervi\w+',
+             'affirmative']
 )
-LOWER_UTERINE_SEGMENT = Pattern(r'(lower uterine segment|low lying|\blus\b)',
+LOWER_UTERINE_SEGMENT = Pattern(r'(lower uter\w+|low position|low lying|\blus\b)',
                                 negates=[negation, 'strings?', 'negative',
                                          r'\b(confirm|check|difficult|determine|if\b|option|talk)'])
 IN_UTERUS = Pattern(
