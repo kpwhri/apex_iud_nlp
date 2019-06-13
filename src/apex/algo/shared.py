@@ -23,7 +23,7 @@ boilerplate = r'\b(complication|pamphlet|warning|information|review|side effect|
 possible = r'\b(unlikely|\bposs\b|possib(ly|le|ility)|improbable|potential|susp(ect|icious)|' \
            r'chance|may\b|afraid|concern|tentative|doubt|thought|think)'
 POSSIBLE = Pattern(possible)
-negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b)'
+negation = r'(no evidence|without|r/o|rule out|normal|\bnot?\b|\bor\b|denies)'
 historical = r'(history|previous|\bhx\b|\bpast\b|\bh/o\b)'
 # avoid months (followed by day/year)
 # avoid 'last' or 'in' or 'since'

@@ -2,7 +2,6 @@ from apex.algo.shared import IUD, boilerplate, hypothetical, historical, negatio
 from apex.algo.pattern import Document, Pattern
 from apex.algo.result import Status, Result
 
-
 misc_excl = r'(\bnose\b|%|hook)'
 
 UTERINE = r'(uter(ine|us))'
@@ -26,6 +25,7 @@ PROPER_LOCATION = Pattern(
 LOWER_UTERINE_SEGMENT = Pattern(r'(lower uter\w+|low position|low lying|\blus\b)',
                                 negates=[negation, 'strings?', 'negative',
                                          r'\b(confirm|check|difficult|determine|if\b|option|talk)'])
+
 IN_UTERUS = Pattern(
     rf'('
     rf'(with)?in the (uter\w+|endometri\w+)'
@@ -34,47 +34,56 @@ IN_UTERUS = Pattern(
     negates=[negation, r'\b(confirm|check|difficult|determine|if\b|option|talk)',
              'strings?', 'especially', 'negative', 'plan', r'cervi\w+']
 )
-PREVIOUS = Pattern(r'(previous|history|\bprior\b|\blast\b)',
+PREVIOUS = Pattern(r'(previous|history|\bprior\b|\blast\b|\bpast\b)',
                    negates=[r'\bago\b', r'\brecent'])
+
 INCORRECT = Pattern(r'(incorrect(ly)?|poor(ly)?|wrong(ly)?|badly|\bmal\b)',
                     negates=[misc_excl, hypothetical, negation, boilerplate, r'diff\w+', 'carcinoma'])
+
 PLACEMENT = Pattern(r'(plac\w+|position\w*|location)',
                     negates=[misc_excl, hypothetical, negation, boilerplate])
+
 MALPOSITION = Pattern(r'(mal (position|place)|trans located)',
                       negates=[misc_excl, hypothetical, negation, boilerplate, in_place])
+
 DISPLACEMENT = Pattern(r'(\brotate\w+'
                        f'|{LOWER_UTERINE}'
                        r'|(displace|dislodge)(d|ment))',
                        negates=[misc_excl, hypothetical, negation, historical, boilerplate, in_place,
                                 r'fractures?\b'])
+
 IN_CERVIX = Pattern(f'{INSIDE} (the )?{CX}',
                     negates=[negation])
-PARTIAL_EXP = Pattern(r'(partial\w* exp[eu]l'
-                      r'|exp[ue]l\w* partial'
-                      f'|{NOTED} (it )?{INSIDE}'
-                      r' (\w+\s+){,4}'
-                      r' (the )?'
-                      f'({LOWER_UTERINE}( and)?'
-                      r' (the )?(\w+\s+){,4})?'
-                      f' {CX_OS}'
-                      f'|(pro|ex)trud\\w+ from (the )?{CX_OS}'
-                      r')',
-                      negates=[misc_excl, negation, 'strings?', 'polyp', boilerplate])
+
+PARTIAL_EXP = Pattern(
+    r'(partial\w* exp[eu]l'
+    r'|exp[ue]l\w* partial'
+    fr'|{NOTED} (it )?{INSIDE} (\w+\s+){{,4}} (the )?({LOWER_UTERINE}( and)? (the )?(\w+\s+){{,4}})? (upper )?{CX_OS}'
+    f'|(pro|ex)trud\\w+ from (the )?{CX_OS}'
+    fr'|(displac|dislodg|mal position|trans locate|{IUD})\w* in ((the|her) )?(upper )?{CX_OS}'
+    r')',
+    negates=[misc_excl, negation, 'strings?', 'polyp', boilerplate])
+
 VISUALIZED = Pattern(f'(({IUD})( was)? {NOTED})',
                      negates=[misc_excl, negation, hypothetical, boilerplate])
+
 MISSING = Pattern(r'(missing|lost|(can(no|\W)?t|(unable|inability) to) (feel|find|locat))',
                   negates=[misc_excl, hypothetical, boilerplate, 'resume', r'\btip\b'])
 
 COMPLETE = Pattern(r'(fell out'
                    r'|(spontaneous|complete)\w* exp[ue]l\w+'
                    r'|exp[ue]l\w+ (spontaneous|complete)'
-                   f'|{IUD} {NOTED}'
-                   r'\w*\s+(\w+\s+){,4}in vagina'
+                   rf'|{IUD} {NOTED}\w*\s+(\w+\s+){{,4}}in vagina'
                    r')',
                    negates=['in case', 'applicator', 'inserter', 'insertion', 'in the past', 'history', r'\bh\W*o\b',
                             hypothetical, boilerplate, misc_excl, in_place, negation, 'string', 'polyp'])
 
 STRINGS = Pattern(r'strings?', negates=['bothersome', NOTED, 'cut', 'check', 'trim'])
+
+STRING_HANGING = Pattern(
+    r'string (stick|hang|protrud|extrud)\w+ (down )?(outside|out( (of|from))?|from|at) ((the|her) )?vagin\w+',
+    negates=['suture', negation, hypothetical, r'\btrim', 'tampon']
+)
 
 
 class ExpulsionStatus(Status):
@@ -91,6 +100,7 @@ class ExpulsionStatus(Status):
     PROPER_PLACEMENT = 10
     IN_UTERUS = 11
     LOWER_UTERINE_SEGMENT = 12
+    HANGING_STRING = 13
     HISTORY = 98
     SKIP = 99
 
@@ -121,5 +131,8 @@ def determine_iud_expulsion(document: Document):
                 yield ExpulsionStatus.PROPER_PLACEMENT, history, section.text
             if section.has_patterns(IN_UTERUS):
                 yield ExpulsionStatus.IN_UTERUS, history, section.text
+        sects = document.select_all_sentences_with_patterns(STRING_HANGING)
+        if sects:
+            yield ExpulsionStatus.HANGING_STRING, None, sects.text
     else:
         yield ExpulsionStatus.SKIP, None, document.text

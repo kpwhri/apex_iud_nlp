@@ -1,7 +1,7 @@
 import pytest
 
 from apex.algo.iud_expulsion import PARTIAL_EXP, MISSING, STRINGS, DISPLACEMENT, INCORRECT, PLACEMENT, PREVIOUS, \
-    PROPER_LOCATION
+    PROPER_LOCATION, STRING_HANGING, IN_UTERUS
 from apex.algo.iud_expulsion_rad import MALPOSITION, NOT_SEEN_IUD, IUD_NOT_SEEN, IUD_PRESENT, STRING, VISIBLE
 from apex.algo.shared import IUD
 
@@ -18,6 +18,8 @@ from apex.algo.shared import IUD
     'IUD was located in the lower uterine segment/upper part of the cervix',
     'identified it in the anterior portion in the lower uterus and cervical canal',
     'visualized extruding from cervical os',
+    'iud in upper cervix',
+    'iud displaced in upper cervix',
 ])
 def test_partial_regex_match(text):
     assert PARTIAL_EXP.matches(text), PARTIAL_EXP.pattern.pattern
@@ -97,7 +99,6 @@ def test_stringsmissing_regex_match(text):
 @pytest.mark.parametrize('text', [
     'iud is in expected position',
     'IUD appears to be in appropriate position within a retroverted uterus',
-    'mirena iud in place',
     'An IUD is in appropriate position within the uterus',
     'appears appropriately positioned',
     'is appropriately positioned',
@@ -110,6 +111,13 @@ def test_stringsmissing_regex_match(text):
 ])
 def test_proper_location_match(text):
     assert PROPER_LOCATION.matches(text)
+
+
+@pytest.mark.parametrize('text', [
+    'mirena iud in place',
+])
+def test_inplace_match(text):
+    assert IN_UTERUS.matches(text)
 
 
 @pytest.mark.parametrize('text', [
@@ -161,3 +169,12 @@ def test_not_stringsmissing_regex_match(text):
 ])
 def test_not_previous_regex_match(text):
     assert not PREVIOUS.matches(text), PREVIOUS.pattern.pattern
+
+
+@pytest.mark.parametrize('text', [
+    'string sticking out of vagina',
+    'string hanging out of the vagina',
+    'string protruding at vaginal opening',
+])
+def test_hangingstring_regex_match(text):
+    assert STRING_HANGING.matches(text)
