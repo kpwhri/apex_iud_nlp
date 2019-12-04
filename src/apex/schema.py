@@ -1,7 +1,13 @@
 import json
 
 import jsonschema
-from ruamel import yaml
+
+try:
+    from ruamel import yaml
+
+    YAML_LOADED = True
+except ModuleNotFoundError:
+    YAML_LOADED = False
 
 JSON_SCHEMA = {
     'type': 'object',
@@ -21,7 +27,9 @@ JSON_SCHEMA = {
                         'type': 'object',
                         'properties': {
                             'name': {'type': 'string'},
-                            'driver': {'type': 'string'},
+                            # include connection string or driver/server/database
+                            'connection_string': {'type': 'string'},
+                            'driver': {'type': 'string'},  # see apex.io.sqlai for preloaded options
                             'server': {'type': 'string'},
                             'database': {'type': 'string'},
                             'name_col': {'type': 'string'},
@@ -134,6 +142,8 @@ def get_config(path):
         if path.endswith('json'):
             return json.load(fh)
         elif path.endswith('yaml'):
+            if not YAML_LOADED:
+                raise ModuleNotFoundError('Need to install `ruamel.yaml`.')
             return yaml.load(fh)
         elif path.endswith('py'):
             return eval(myexec(fh.read()))

@@ -2,8 +2,7 @@ import csv
 import datetime
 import os
 
-from cronkd.conn.db import sqlai
-
+from apex.io import sqlai
 
 DATETIME_STR = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 

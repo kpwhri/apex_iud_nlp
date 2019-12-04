@@ -53,15 +53,15 @@ def classify_result(res: InsertionStatus):
 def confirm_iud_insertion(document: Document, expected=None):
     value, text = determine_iud_insertion(document)
     res = classify_result(value)
-    return Result(value, res, expected, text)
+    yield Result(value, res, expected, text)
 
 
 def determine_iud_insertion(document: Document):
     # discusses iud
     if document.has_patterns(IUD, INSERTION, has_all=True):
-        section = document.select_sentences_with_patterns(IUD, INSERTION, STRINGS,
-                                                          negation=[HISTORICAL, APPOINTMENT, DATE, NEGATED],
-                                                          neighboring_sentences=1)
+        section = list(document.select_sentences_with_patterns(IUD, INSERTION, STRINGS,
+                                                               negation=[HISTORICAL, APPOINTMENT, DATE, NEGATED],
+                                                               neighboring_sentences=1))
         if section:
             if section.has_patterns(PRE_SUCCESS):
                 return InsertionStatus.SUCCESS, section.text

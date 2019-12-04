@@ -114,7 +114,6 @@ def determine_difficult_insertion(document: Document):
         if sent:
             yield DiffInsStatus.UNSUCCESSFUL, sent
         if document.has_patterns(INSERTION, ignore_negation=True):
-            found = False
             for section in document.select_sentences_with_patterns(INSERTION, neighboring_sentences=1):
                 if section.has_patterns(UNSUCCESSFUL_INSERTION, has_all=True):
                     yield DiffInsStatus.UNSUCCESSFUL, section.text
@@ -123,16 +122,11 @@ def determine_difficult_insertion(document: Document):
                     continue
                 if section.has_patterns(PROVIDER):
                     yield DiffInsStatus.PROVIDER_STATEMENT, section.text
-                    found = True
                 if section.has_patterns(US, US_USED, has_all=True):
                     yield DiffInsStatus.ULTRASOUND_GUIDANCE, section.text
-                    found = True
                 if section.has_patterns(PARACERV):
                     yield DiffInsStatus.PARACERVICAL_BLOCK, section.text
-                    found = True
                 if section.has_patterns(MISOPROSTOL):
                     yield DiffInsStatus.MISOPROSTOL, section.text
-                    found = True
                 if section.has_patterns(CERV_DIL):
                     yield DiffInsStatus.CERVICAL_DILATION, section.text
-                    found = True

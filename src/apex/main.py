@@ -46,7 +46,7 @@ def process(corpus=None, annotation=None, annotations=None, output=None, select=
     results = {name: Reporter() for name in algos}
     with get_file_wrapper(**output) as out, \
             get_logging(**kw(loginfo)) as log, \
-            Skipper(**skipinfo) as skipper:
+            Skipper(**kw(skipinfo)) as skipper:
         for i, doc in enumerate(get_next_from_corpus(**kw(corpus), **kw(select), skipper=skipper)):
             for name, alg_func in algos.items():
                 max_res = None

@@ -4,7 +4,7 @@ import random
 import sys
 from collections import defaultdict
 
-from cronkd.util.docx import add_table_of_contents
+
 from docx import Document
 
 

@@ -1,19 +1,22 @@
 import itertools
 import os
 
-from cronkd.conn.db import sqlai
 
 from apex.algo.pattern import Document
+from apex.io import sqlai
 
 
-def get_next_from_directory(directory, directories, version, filenames=None,
+def get_next_from_directory(directory, directories, version=None, filenames=None,
                             encoding='utf8'):
     if directory or directories:
         directories = directories or []
         if directory:
             directories.insert(0, directory)
         for directory in directories:
-            corpus_dir = os.path.join(directory, version)
+            if version:
+                corpus_dir = os.path.join(directory, version)
+            else:
+                corpus_dir = directory
             if filenames:  # only look for specified files
                 for file in filenames:
                     fp = os.path.join(corpus_dir, file)
@@ -40,7 +43,7 @@ def get_next_from_connections(*connections):
             yield doc_name, None, text
 
 
-def get_next_from_sql(name=None, driver=None, server=None,
+def get_next_from_sql(name=None, connection_string=None, driver=None, server=None,
                       database=None, name_col=None, text_col=None):
     """
     :param name_col:
@@ -50,8 +53,12 @@ def get_next_from_sql(name=None, driver=None, server=None,
     :param server: name of server (if connecting to database)
     :param database: name of database (if connecting to database)
     """
-    if name and driver and server and database:
+    eng = None
+    if driver and server and database:
         eng = sqlai.get_engine(driver=driver, server=server, database=database)
+    elif connection_string:
+        eng = sqlai.get_engine(connection_string=connection_string)
+    if eng:
         for doc_name, text in eng.execute(f'select {name_col}, {text_col} from {name}'):
             yield doc_name, text
 
@@ -94,8 +101,8 @@ class Skipper:
     def __init__(self, path=None, rebuild=False, ignore=False):
         self.fp = path
         self.fh = None
-        self.rebuild = rebuild
-        self.ignore = ignore
+        self.rebuild = rebuild  # ignore, rebuild loginfo
+        self.ignore = ignore  # don't read in skips
         self.skips = self._read_skips()
 
     def _read_skips(self):
