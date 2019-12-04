@@ -7,6 +7,8 @@ from collections import defaultdict
 
 from docx import Document
 
+from apex.io.docx import add_table_of_contents
+
 
 def snippet_samples(fp, sample=25, encoding='utf8', pattern='text_*.out'):
     res = defaultdict(lambda: defaultdict(set))

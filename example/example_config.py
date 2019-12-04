@@ -43,7 +43,7 @@ schema = {
         'encoding': 'utf8',
         'filenames': ['FILE_1', 'FILE_2'],  # only these filenames
     },
-    'algorithm': {  # see options in apex.algo.__init__.py
+    'algorithm': {  # see options in apex.algo.__init__.py; remove for all algos
         'names': [
             'ALGORITHM_1',
             'ALGORITHM_2',
