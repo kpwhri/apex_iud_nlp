@@ -25,7 +25,7 @@ TOOL = Pattern(r'((ring )?forceps?|hook|speculum|fashion|(alligator )? clamp|'
                r'strings? (grasp|clasp)|(grasp|clasp)\w* strings?|'
                r'(with|gentle|more|\bw) traction|technique)',
                negates=[r'\bplaced\b', 'insertion', 'trimmed',
-                        'unsuccessful', 'unable', 'not (recover|retriev|remove)\\w+'])
+                        'unsuccessful', 'unable', r'not (recover|retriev|remove)\w+'])
 PLAN = Pattern(r'\brem intrauterine device\b',
                negates=[])
 ALL = (REMOVE, DEF_REMOVE, PROB_REMOVE, DEF_REPLACE, TOOL, PLAN)

@@ -22,8 +22,9 @@ NOT_SUCCESSFUL = Pattern(r'(n[o\']t|without|no)\W*(success)')
 UNSUCCESSFUL = Pattern(r'(unsuccess|abandon)')
 HYPOTHETICAL = Pattern(r'(following|remember)')
 POST_SUCCESS = Pattern(r'(success|length of string|strings (cut|trim)|iud was( then)? insert)')
-PRE_SUCCESS = Pattern(r'(without(\W*any)?\W*(difficult|problem)|as usual|usual( sterile)? fashion|strings were trimmed|'
-                      r'per manufacturer[\'s]*\W*recommend)')
+PRE_SUCCESS = Pattern(r'(without(\W*any)?\W*(difficult|problem)|as usual|usual( sterile)? fashion'
+                      r'|strings were (trimmed|cut)'
+                      r'|per manufacturer[\'s]*\W*recommend)')
 POST_OP = Pattern(r'(you think are related to the iud|check the (iud )?strings|'
                   r'have your iud removed or replaced)')
 HISTORICAL = Pattern(r'(in the past|previous|months ago|days ago|last week|last month)')
@@ -59,9 +60,9 @@ def confirm_iud_insertion(document: Document, expected=None):
 def determine_iud_insertion(document: Document):
     # discusses iud
     if document.has_patterns(IUD, INSERTION, has_all=True):
-        section = list(document.select_sentences_with_patterns(IUD, INSERTION, STRINGS,
-                                                               negation=[HISTORICAL, APPOINTMENT, DATE, NEGATED],
-                                                               neighboring_sentences=1))
+        section = document.select_all_sentences_with_patterns(IUD, INSERTION, STRINGS,
+                                                              negation=[HISTORICAL, APPOINTMENT, DATE, NEGATED],
+                                                              neighboring_sentences=1)
         if section:
             if section.has_patterns(PRE_SUCCESS):
                 return InsertionStatus.SUCCESS, section.text

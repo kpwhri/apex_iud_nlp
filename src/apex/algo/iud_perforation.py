@@ -13,9 +13,9 @@ COMPLETE = Pattern('('
                    'intra (peritoneal|abdominal)|'
                    'complete(ly)? perforat(ion|ed|e)s?|'
                    'extrauterine|omentum|abdominopelvic|'
-                   r'perforat(ion|ed|e)s?|(pierc\w+|thr(ough|u)|into)( the)?( uterine)? '
-                   r'(serosa|perimetrium|adnexa\w*)|'
-                   f'{IUD} (visible|seen|visual\\w+)? in vagina'
+                   r'perforat(ion|ed|e)s?'
+                   r'|(pierc\w+|thr(ough|u)|into)( the)?( uterine)? (serosa|perimetrium|adnexa\w*)'
+                   rf'|{IUD} (visible|seen|visual\w+)? in vagina'
                    r')',
                    negates=[boilerplate, historical, negation, impact_neg, possible,
                             hypothetical, 'against', 'free'])
@@ -24,8 +24,9 @@ PERFORATION = Pattern(r'('
                       r'( the)?( uterine)? (wall|myometrium|serosa)'
                       r')',
                       negates=[boilerplate, historical, negation, impact_neg, possible, hypothetical])
-PARTIAL = Pattern(f'(partial(ly)? perforat(ion|ed|e)s?|arm broke|broken {IUD}|'
-                  f'{IUD} (is|was)? (stuck|(visible|visual\\w+|seen) (at|in)? cervix)'
+PARTIAL = Pattern(f'(partial(ly)? perforat(ion|ed|e)s?'
+                  f'|arm broke|broken {IUD}'
+                  fr'|{IUD} (is|was)? (stuck|(visible|visual\w+|seen) (at|in)? (the)? cervix)'
                   f')',
                   negates=[boilerplate, historical, possible, negation, impact_neg, possible, hypothetical])
 EMBEDDED = Pattern(f'({embedded})',
@@ -33,8 +34,8 @@ EMBEDDED = Pattern(f'({embedded})',
 MIGRATED = Pattern(f'{migrated}',
                    negates=[boilerplate, historical, possible, negation, 'strings?', in_place])
 LAPAROSCOPIC_REMOVAL = Pattern(r'('
-                               r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\s+){0,10} (remov|retriev)\w+|'
-                               r'(remov|retriev)\w+(\w+\s+){0,10}lap[ao]r[ao]scop\w+'
+                               r'(lap[ao]r[ao](scop|tom)|pelviscop)(\w+\W+){0,10} (remov|retriev)\w+'
+                               r'|(remov|retriev)\w+(\w+\s+){0,10}lap[ao]r[ao]scop\w+'
                                r')',
                                negates=[historical, boilerplate, r'hysterectom\w+', r'excis\w+',
                                         'cysts?', r'tubal ligati\w+', r'steriliz\w+', r'bilat\w+',
