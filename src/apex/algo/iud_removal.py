@@ -21,7 +21,7 @@ DEF_REMOVE = Pattern(f'{IUD} ('
                      f')', negates=['risk', 'to (have|get)', 'come in'])
 
 DEF_REPLACE = Pattern(f'{IUD} remov(ed|al) {words_3} replac')
-TOOL = Pattern(r'((ring )?forceps?|hook|speculum|fashion|(alligator )? clamp|'
+TOOL = Pattern(r'((ring )?forceps?|hook|fashion|(alligator )? clamp|'
                r'strings? (grasp|clasp)|(grasp|clasp)\w* strings?|'
                r'(with|gentle|more|\bw) traction|technique)',
                negates=[r'\bplaced\b', 'insertion', 'trimmed',
