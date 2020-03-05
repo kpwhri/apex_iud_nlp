@@ -71,7 +71,7 @@ US_USED = Pattern(r'('
                   r')',
                   negates=[negation])
 # uterine/uterus
-CERV_DIL = Pattern(r'(cervical (dilat|ripen)\w+|(dilat|ripen)\w*( of)?( the?) cervix)',
+CERV_DIL = Pattern(r'(cervical dilat\w+|dilat\w*( of)?( the?) cervix)',
                    negates=[negation])
 PARACERV = Pattern(r'(\blido\b|hurricane|\w+caine\b|paracervical block)',
                    negates=[negation])
