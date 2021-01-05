@@ -20,7 +20,7 @@ G_PARA_N = Pattern(r'(?:g(\d)p(\d)\d\d\d\W|'  # "x is a G2P1001 with ..."
                    r'g (\d{1,2}) p (\d{1,4})|'
                    r'grav para term preterm abortions tab sab ect mult living (\d{1,2}) (\d{1,2}))',
                    capture_length=2)
-CHILD_NUM = Pattern(r'number of children: ([1-9]{1,2})\W')
+CHILD_NUM = Pattern(r'number of children: ([1-9][0-9])\W')
 CHILD_N = Pattern(r'number of children: (one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)')
 # "one child" has two many false positives, discussing "one child...[did this or that]"
 N_CHILD = Pattern(r'(two|three|four|five|six|seven|eight|nine|ten|eleven|twelve) children')
