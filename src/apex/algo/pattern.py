@@ -19,6 +19,7 @@ class Match:
                 res.append(self.match.group())
             else:
                 res.append(self._groups[idx - 1])
+        return res
 
     def groups(self):
         if not self._groups:

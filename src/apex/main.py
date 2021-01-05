@@ -59,7 +59,7 @@ def process(corpus=None, annotation=None, annotations=None, output=None, select=
                         break
                     log.writeline([doc.name, name, res.value, res.result, doc.matches, res.text])
                     # only take max
-                    if not max_res or res.result > max_res.result:
+                    if not max_res or (res.result > max_res.result and res.confidence >= max_res.confidence ):
                         max_res = res
                 else:  # avoid if skipped
                     if max_res is not None:

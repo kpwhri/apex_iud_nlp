@@ -1,7 +1,7 @@
 import logging
 
 from apex.algo.pattern import Document, Pattern
-from apex.algo.result import Result, Status, Source
+from apex.algo.result import Result, Status, Source, Confidence
 
 GRAVIDA_0 = Pattern(r'(\b(g|grav\w*) 0\W|'
                     r'grav para term preterm abortions tab sab ect mult living 0)')
@@ -16,8 +16,8 @@ CHILD_0 = Pattern(r'children: (none|0)')
 PARA_NNNN = Pattern(r'para (\d)\d\d\d')
 PARA_N = Pattern(r'par(?:a|ity) p?(\d{1,2})\b')
 G_PARA_N = Pattern(r'(?:g(\d)p(\d)\d\d\d\W|'  # "x is a G2P1001 with ..."
-                   r'\bg (\d{1,2}) p (\d{1,2})|'
-                   r'g (\d{1,2}) p (\d{1,2})|'
+                   r'\bg (\d{1,2}) p (\d{1,4})|'
+                   r'g (\d{1,2}) p (\d{1,4})|'
                    r'grav para term preterm abortions tab sab ect mult living (\d{1,2}) (\d{1,2}))',
                    capture_length=2)
 CHILD_NUM = Pattern(r'number of children: ([1-9]{1,2})\W')
@@ -54,7 +54,8 @@ class ParityStatus(Status):
 
 def get_parity(document: Document, expected=None):
     status, text, source = determine_parity(document)
-    yield Result(status, status.value, expected, text, extras=source)
+    conf = Confidence.LOW if source == ParitySource.CHILDREN else Confidence.MEDIUM
+    yield Result(status, status.value, expected, text, extras=source, confidence=conf)
 
 
 def determine_parity(document: Document):
@@ -77,10 +78,19 @@ def determine_parity(document: Document):
         except TypeError:
             raise TypeError(f'Values of g/p are None (or similar): {capt_p}, {capt_g} in {text}')
         else:
+            if len(capt_p) == 4:
+                capt_p = capt_p[0]
+                p = int(capt_p)
             if g >= p:
                 status = extract_status(capt_p)
                 if status:
                     return status, text, ParitySource.PARITY
+            elif g == p - 1:  # common error: counting twins as extra parity
+                logging.warning(f'Including Gravida {g}, Parity {p} '
+                                f'(assuming twins counted as extra parity): {document.name}')
+                status = extract_status(capt_g)  # use gravida not parity
+                if status:
+                    return status, text, ParitySource.GRAVIDA
             else:
                 logging.info(f'Gravida {g} < Parity {p}: {document.name}')
 
